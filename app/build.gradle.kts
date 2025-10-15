@@ -43,8 +43,12 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation (platform("com.google.firebase:firebase-auth"))
+    implementation (platform("com.google.firebase:firebase-firestore"))
     androidTestImplementation(libs.espresso.core)
 }

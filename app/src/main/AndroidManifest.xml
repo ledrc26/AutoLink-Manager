@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permiso para conexión a internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,18 +13,37 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AutoLinkManager">
+        android:theme="@style/Theme.AutoLinkManager"
+        tools:targetApi="31">
+
+        <!-- Actividad de REGISTRO -->
         <activity
-            android:name=".MainActivity"
+            android:name="RegisterActivity"
+            android:exported="false"
+            android:label="Registrar usuario"
+            android:theme="@style/Theme.AutoLinkManager" />
+
+        <!-- Actividad de LOGIN (pantalla inicial) -->
+        <activity
+            android:name="LoginActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AutoLinkManager.NoActionBar">
+            android:label="Iniciar sesión"
+            android:theme="@style/Theme.AutoLinkManager">
+
+            <!-- Esta es la actividad que se lanza al iniciar la app -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Actividad principal (solo se entra tras iniciar sesión) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AutoLinkManager.NoActionBar" />
+
     </application>
 
 </manifest>
