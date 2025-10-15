@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230502399667",
+    "project_id": "autolink-manager-6fabd",
+    "storage_bucket": "autolink-manager-6fabd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230502399667:android:056ff2928de49a7cfc7ac6",
+        "android_client_info": {
+          "package_name": "com.example.autolinkmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUka2eUBQrE0WwMAUK4JlHGYvYpv6U2yE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
