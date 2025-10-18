@@ -14,4 +14,12 @@
         android:inputType="phone"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btnChangeLocation"
+        android:text="Cambiar ubicación en mapa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"/>
+
 </LinearLayout>

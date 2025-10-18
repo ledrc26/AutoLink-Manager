@@ -19,6 +19,7 @@ import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ManageAgenciesFragment extends Fragment {
 
@@ -84,16 +85,18 @@ public class ManageAgenciesFragment extends Fragment {
     private void showEditDialog(DocumentSnapshot doc) {
         String currentName = doc.getString("name");
         String currentPhone = doc.getString("phone");
+        AtomicReference<GeoPoint> currentLoc = new AtomicReference<>(doc.getGeoPoint("location"));
 
         View content = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_agency, null, false);
         EditText etName = content.findViewById(R.id.etName);
         EditText etPhone = content.findViewById(R.id.etPhone);
+        View btnChangeLocation = content.findViewById(R.id.btnChangeLocation);
 
         etName.setText(currentName != null ? currentName : "");
         etPhone.setInputType(InputType.TYPE_CLASS_PHONE);
         etPhone.setText(currentPhone != null ? currentPhone : "");
 
-        new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setTitle("Editar agencia")
                 .setView(content)
                 .setPositiveButton("Guardar", (d, w) -> {
@@ -111,8 +114,25 @@ public class ManageAgenciesFragment extends Fragment {
                             .addOnFailureListener(err -> Snackbar.make(rv, "Error: " + err.getMessage(), Snackbar.LENGTH_LONG).show());
                 })
                 .setNegativeButton("Cancelar", null)
-                .show();
+                .create();
+
+        dialog.show();
+
+        btnChangeLocation.setOnClickListener(v -> {
+            dialog.dismiss();
+            Bundle args = new Bundle();
+            args.putString("agencyId", doc.getId());
+            currentLoc.set(doc.getGeoPoint("location"));
+            if (currentLoc.get() != null) {
+                args.putFloat("lat", (float) currentLoc.get().getLatitude());
+                args.putFloat("lng", (float) currentLoc.get().getLongitude());
+            }
+            androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                    .navigate(R.id.nav_pick_agency_location, args);
+        });
+
     }
+
 
     private void confirmDelete(DocumentSnapshot doc) {
         new AlertDialog.Builder(requireContext())

@@ -21,30 +21,33 @@
 
         <item
             android:id="@+id/nav_create_agency"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/baseline_add_24"
             android:title="Crear agencia"
             android:visible="true" />
 
         <item
             android:id="@+id/nav_agencies_map"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ubicaciones"
             android:title="Mostrar agencias" />
 
         <item
             android:id="@+id/nav_assign_agency"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/asignar"
             android:title="Asignar agencia" />
 
         <item
             android:id="@+id/nav_manage_agencies"
+            android:icon="@drawable/blogger"
             android:title="Administrar agencias" />
     </group>
 
     <item
         android:id="@+id/nav_about"
+        android:icon="@drawable/acerca"
         android:title="Acerca de" />
 
     <item
         android:id="@+id/nav_logout"
+        android:icon="@drawable/cerrar"
         android:title="Cerrar sesión" />
 </menu>

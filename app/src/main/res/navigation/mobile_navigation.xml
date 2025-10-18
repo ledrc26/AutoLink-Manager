@@ -47,5 +47,15 @@
         android:label="Administrar agencias"
         tools:layout="@layout/fragment_manage_agencies" />
 
+    <fragment
+        android:id="@+id/nav_pick_agency_location"
+        android:name="com.example.autolinkmanager.ui.admin.PickAgencyLocationFragment"
+        android:label="Elegir ubicación"
+        tools:layout="@layout/fragment_pick_agency_location">
 
+        <argument
+            android:name="agencyId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
 </navigation>
