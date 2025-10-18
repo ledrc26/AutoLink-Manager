@@ -1,22 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    android:background="#121212"
+    tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/text_home"
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="?attr/actionBarSize"> <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dashboard (Agencia)"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+                <LinearLayout style="@style/StatCardContent">
+                    <TextView style="@style/StatCardValue" android:text="2" />
+                    <TextView style="@style/StatCardTitle" android:text="Vehículos registrados" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+                <LinearLayout style="@style/StatCardContent">
+                    <TextView style="@style/StatCardValue" android:text="1" />
+                    <TextView style="@style/StatCardTitle" android:text="Servicios en curso" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+                <LinearLayout style="@style/StatCardContent">
+                    <TextView style="@style/StatCardValue" android:text="1" />
+                    <TextView style="@style/StatCardTitle" android:text="Pagos pendientes" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="4"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+                <LinearLayout style="@style/ActionCardContent">
+                    <ImageView style="@style/ActionCardIcon"
+                        android:src="@drawable/outline_add_24"
+                        android:contentDescription="Alta"/>
+                    <TextView style="@style/ActionCardText" android:text="Alta vehículo" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+                <LinearLayout style="@style/ActionCardContent">
+                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/baseline_app_registration_24" android:contentDescription="Registrar"/>
+                    <TextView style="@style/ActionCardText" android:text="Registrar servicio" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+                <LinearLayout style="@style/ActionCardContent">
+                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_list_alt_24" android:contentDescription="Ver"/>
+                    <TextView style="@style/ActionCardText" android:text="Ver servicios" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+                <LinearLayout style="@style/ActionCardContent">
+                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_attach_money_24" android:contentDescription="Cobros"/>
+                    <TextView style="@style/ActionCardText" android:text="Cobros" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#222222"
+            app:cardCornerRadius="12dp"
+            android:layout_marginBottom="24dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/outline_cloud_upload_24"
+                    app:tint="#AAAAAA"
+                    android:layout_marginEnd="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sincronización: 3 en cola"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Últimos movimientos"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
+                <RelativeLayout style="@style/MovimientoItemContent">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true">
+                        <TextView style="@style/MovimientoItemTextMain" android:text="XYZ789" />
+                        <TextView style="@style/MovimientoItemTextSub" android:text="Modelo 3" />
+                    </LinearLayout>
+                    <com.google.android.material.chip.Chip
+                        style="@style/StatusChip.Pagado"
+                        android:text="Pagado" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
+                <RelativeLayout style="@style/MovimientoItemContent">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true">
+                        <TextView style="@style/MovimientoItemTextMain" android:text="ABC123" />
+                        <TextView style="@style/MovimientoItemTextSub" android:text="EcoSport" />
+                    </LinearLayout>
+                    <com.google.android.material.chip.Chip
+                        style="@style/StatusChip.Pendiente"
+                        android:text="Pendiente" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
+                <RelativeLayout style="@style/MovimientoItemContent">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true">
+                        <TextView style="@style/MovimientoItemTextMain" android:text="XYZ789" />
+                        <TextView style="@style/MovimientoItemTextSub" android:text="Modelo 3" />
+                    </LinearLayout>
+                    <com.google.android.material.chip.Chip
+                        style="@style/StatusChip.Pendiente"
+                        android:text="Pendiente" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
