@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
-                R.id.nav_create_agency, R.id.nav_agencies_map
+                R.id.nav_create_agency, R.id.nav_agencies_map, R.id.nav_assign_agency
         ).setOpenableLayout(drawer).build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            if ((id == R.id.nav_create_agency || id == R.id.nav_agencies_map) && !isAdmin) {
+            if ((id == R.id.nav_create_agency || id == R.id.nav_agencies_map || id == R.id.nav_assign_agency) && !isAdmin) {
                 Snackbar.make(binding.getRoot(), "Acceso solo para administradores", Snackbar.LENGTH_SHORT).show();
                 drawer.closeDrawers();
-                return true; // consumimos el click, no navegamos
+                return true;
             }
 
             boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
@@ -94,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
                     String role = snap.getString("role");
                     isAdmin = "admin".equalsIgnoreCase(role);
 
-                    // Mostrar/ocultar items de admin
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(isAdmin);
                     binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(isAdmin);
+                    binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(isAdmin);
                 })
                 .addOnFailureListener(e -> {
                     isAdmin = false;

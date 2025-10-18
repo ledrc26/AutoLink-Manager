@@ -35,4 +35,11 @@
         android:label="Agencias en el mapa"
         tools:layout="@layout/fragment_agencies_map" />
 
+    <fragment
+        android:id="@+id/nav_assign_agency"
+        android:name="com.example.autolinkmanager.ui.admin.AssignAgencyFragment"
+        android:label="Asignar agencia"
+        tools:layout="@layout/fragment_assign_agency" />
+
+
 </navigation>
