@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
-                R.id.nav_create_agency, R.id.nav_agencies_map, R.id.nav_assign_agency
+                R.id.nav_create_agency, R.id.nav_agencies_map, R.id.nav_assign_agency,
+                R.id.nav_manage_agencies
         ).setOpenableLayout(drawer).build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_assign_agency).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(false);
 
         showAdminItemsIfNeeded();
 
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            if ((id == R.id.nav_create_agency || id == R.id.nav_agencies_map || id == R.id.nav_assign_agency) && !isAdmin) {
+            if ((id == R.id.nav_create_agency || id == R.id.nav_agencies_map || id == R.id.nav_assign_agency || id == R.id.nav_manage_agencies) && !isAdmin) {
                 Snackbar.make(binding.getRoot(), "Acceso solo para administradores", Snackbar.LENGTH_SHORT).show();
                 drawer.closeDrawers();
                 return true;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(isAdmin);
                     binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(isAdmin);
                     binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(isAdmin);
+                    binding.navView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(isAdmin);
                 })
                 .addOnFailureListener(e -> {
                     isAdmin = false;

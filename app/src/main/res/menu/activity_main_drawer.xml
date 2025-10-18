@@ -34,6 +34,10 @@
             android:id="@+id/nav_assign_agency"
             android:icon="@drawable/ic_menu_camera"
             android:title="Asignar agencia" />
+
+        <item
+            android:id="@+id/nav_manage_agencies"
+            android:title="Administrar agencias" />
     </group>
 
     <item

@@ -41,5 +41,11 @@
         android:label="Asignar agencia"
         tools:layout="@layout/fragment_assign_agency" />
 
+    <fragment
+        android:id="@+id/nav_manage_agencies"
+        android:name="com.example.autolinkmanager.ui.admin.ManageAgenciesFragment"
+        android:label="Administrar agencias"
+        tools:layout="@layout/fragment_manage_agencies" />
+
 
 </navigation>
