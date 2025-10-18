@@ -22,4 +22,11 @@
         android:name="com.example.autolinkmanager.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+
+    <fragment
+        android:id="@+id/nav_create_agency"
+        android:name="com.example.autolinkmanager.ui.admin.CreateAgencyFragment"
+        android:label="Crear agencia"
+        tools:layout="@layout/fragment_create_agency" />
+
 </navigation>

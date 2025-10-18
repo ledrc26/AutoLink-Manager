@@ -4,6 +4,8 @@
 
     <!-- Permiso para conexión a internet -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,6 @@
         <activity
             android:name="LoginActivity"
             android:exported="true"
-            android:label="Iniciar sesión"
             android:theme="@style/Theme.AutoLinkManager">
 
             <!-- Esta es la actividad que se lanza al iniciar la app -->

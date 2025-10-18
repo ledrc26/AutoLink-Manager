@@ -93,7 +93,7 @@ public class RegisterActivity extends AppCompatActivity {
                             String uid = fUser.getUid();
 
                             // Guardar perfil en Firestore
-                            User user = new User(uid, email, nombre);
+                            User user = new User(uid, email, nombre, "agency"); // <-- por defecto agency
                             db.collection("users").document(uid).set(user)
                                     .addOnSuccessListener(unused -> {
                                         Log.d(TAG, "Perfil guardado en Firestore");
