@@ -3,12 +3,9 @@ package com.example.autolinkmanager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
-
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -29,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
+    private boolean isAdmin = false; //
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,24 +45,23 @@ public class MainActivity extends AppCompatActivity {
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
-        // 🔹 Configuración del Navigation Drawer
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_create_agency
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
+                R.id.nav_create_agency, R.id.nav_agencies_map
         ).setOpenableLayout(drawer).build();
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // 🔹 Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // 🔹 Oculta "Crear agencia" por defecto hasta verificar rol
         navigationView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
+
         showAdminItemsIfNeeded();
 
-        // 🔹 Listener del Drawer para manejar “Cerrar sesión”
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -73,16 +71,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            // Navegación normal para los demás items
+            if ((id == R.id.nav_create_agency || id == R.id.nav_agencies_map) && !isAdmin) {
+                Snackbar.make(binding.getRoot(), "Acceso solo para administradores", Snackbar.LENGTH_SHORT).show();
+                drawer.closeDrawers();
+                return true; // consumimos el click, no navegamos
+            }
+
             boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
             if (handled) drawer.closeDrawers();
             return handled;
         });
     }
 
-    /**
-     * Muestra u oculta el ítem “Crear agencia” según el rol del usuario actual.
-     */
     private void showAdminItemsIfNeeded() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
@@ -92,17 +92,19 @@ public class MainActivity extends AppCompatActivity {
         db.collection("users").document(uid).get()
                 .addOnSuccessListener(snap -> {
                     String role = snap.getString("role");
-                    boolean isAdmin = "admin".equalsIgnoreCase(role);
+                    isAdmin = "admin".equalsIgnoreCase(role);
+
+                    // Mostrar/ocultar items de admin
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(isAdmin);
+                    binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(isAdmin);
                 })
                 .addOnFailureListener(e -> {
+                    isAdmin = false;
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
+                    binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
                 });
     }
 
-    /**
-     * Cierra la sesión y regresa al LoginActivity limpiando el historial.
-     */
     private void logoutUser() {
         FirebaseAuth.getInstance().signOut();
 

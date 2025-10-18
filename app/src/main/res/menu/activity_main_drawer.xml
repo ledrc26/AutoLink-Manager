@@ -24,6 +24,11 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="Crear agencia"
             android:visible="true" />
+
+        <item
+            android:id="@+id/nav_agencies_map"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Mostrar agencias" />
     </group>
 
     <item
