@@ -29,4 +29,10 @@
         android:label="Crear agencia"
         tools:layout="@layout/fragment_create_agency" />
 
+    <fragment
+        android:id="@+id/nav_agencies_map"
+        android:name="com.example.autolinkmanager.ui.admin.AgenciesMapFragment"
+        android:label="Agencias en el mapa"
+        tools:layout="@layout/fragment_agencies_map" />
+
 </navigation>
