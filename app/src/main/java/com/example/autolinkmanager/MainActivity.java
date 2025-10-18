@@ -1,8 +1,14 @@
 package com.example.autolinkmanager;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -59,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         navigationView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_assign_agency).setVisible(false);
 
         showAdminItemsIfNeeded();
 
@@ -67,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.nav_logout) {
                 logoutUser();
+                drawer.closeDrawers();
+                return true;
+            }
+
+            if (id == R.id.nav_about) {
+                showAboutDialog();
                 drawer.closeDrawers();
                 return true;
             }
@@ -102,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     isAdmin = false;
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
                     binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
+                    binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(false);
                 });
     }
 
@@ -125,5 +139,47 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    private void showAboutDialog() {
+        // Opción A: usar layout personalizado (dialog_about.xml)
+        View content = LayoutInflater.from(this).inflate(R.layout.dialog_about, null, false);
+
+        // (Opcional) completar versión dinámica y permisos reales
+        String versionName = "1.0";
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException ignored) {}
+
+        // Si quieres poner la versión en el título del layout, puedes buscar una TextView y setearla.
+        // TextView tvVersion = content.findViewById(R.id.tvVersion);  // si la agregas
+        // tvVersion.setText("Versión " + versionName);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Acerca de")
+                .setView(content)
+                .setPositiveButton("OK", (d, w) -> d.dismiss())
+                .show();
+
+        // --- Opción B (si NO quieres layout, descomenta y usa esto en su lugar) ---
+    /*
+    String msg =
+        "AutoLink Manager\n" +
+        "Versión " + versionName + "\n\n" +
+        "Desarrolladores:\n" +
+        "• Elian Pérez\n" +
+        "• Eduardo De Rosas\n" +
+        "Carrera: ISW\n" +
+        "Profesora: Rocío Pulido\n\n" +
+        "Permisos utilizados:\n" +
+        "- INTERNET\n- ACCESS_NETWORK_STATE\n- ACCESS_FINE_LOCATION\n- ACCESS_COARSE_LOCATION\n- WRITE_EXTERNAL_STORAGE (solo <= Android 9)";
+    new MaterialAlertDialogBuilder(this)
+        .setIcon(R.drawable.ic_info)
+        .setTitle("Acerca de")
+        .setMessage(msg)
+        .setPositiveButton("OK", (d, w) -> d.dismiss())
+        .show();
+    */
     }
 }
