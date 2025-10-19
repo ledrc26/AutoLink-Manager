@@ -44,6 +44,11 @@
             android:id="@+id/nav_add_car"
             android:icon="@drawable/outline_directions_car_24"
             android:title="Agregar automovil" />
+
+        <item
+            android:id="@+id/nav_car_list"
+            android:icon="@drawable/outline_list_alt_24"
+            android:title="Lista de automoviles" />
     </group>
 
     <item

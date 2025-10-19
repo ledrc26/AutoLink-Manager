@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="4"
+            android:weightSum="3"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
@@ -69,13 +69,6 @@
                         android:src="@drawable/outline_add_24"
                         android:contentDescription="Alta"/>
                     <TextView style="@style/ActionCardText" android:text="Alta vehículo" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
-                <LinearLayout style="@style/ActionCardContent">
-                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/baseline_app_registration_24" android:contentDescription="Registrar"/>
-                    <TextView style="@style/ActionCardText" android:text="Registrar servicio" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -94,33 +87,6 @@
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="#222222"
-            app:cardCornerRadius="12dp"
-            android:layout_marginBottom="24dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/outline_cloud_upload_24"
-                    app:tint="#AAAAAA"
-                    android:layout_marginEnd="12dp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sincronización: 3 en cola"
-                    android:textColor="#AAAAAA"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:layout_width="wrap_content"

@@ -116,4 +116,28 @@
             app:argType="string"
             android:defaultValue="" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_car_list"
+        android:name="com.example.autolinkmanager.ui.carlist.CarListFragment"
+        android:label="Mis Vehículos"
+        tools:layout="@layout/fragment_car_list">
+        <action
+            android:id="@+id/action_nav_car_list_to_nav_car_details"
+            app:destination="@id/nav_car_details">
+            <argument
+                android:name="vehicle_doc_id"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_car_details"
+        android:name="com.example.autolinkmanager.ui.cardetails.CarDetailsFragment"
+        android:label="Detalles del Vehículo"
+        tools:layout="@layout/fragment_car_details">
+        <argument
+            android:name="vehicle_doc_id"
+            app:argType="string" />
+    </fragment>
 </navigation>
