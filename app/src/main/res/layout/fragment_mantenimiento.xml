@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Servicio: Mantenimiento"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de mantenimiento"
+            android:textColor="#AAAAAA"/>
+        <Spinner
+            android:id="@+id/til_tipo_mantenimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#555555"
+            android:layout_marginBottom="4dp"/>
+        <TextView
+            android:id="@+id/tv_tipo_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Campo obligatorio"
+            android:textColor="#FF5252"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha de ingreso"
+                    android:textColor="#AAAAAA"/>
+                <EditText
+                    android:id="@+id/til_fecha_ingreso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="dd/mm/aaaa"
+                    android:textColor="#AAAAAA"
+                    android:backgroundTint="#555555"
+                    android:focusable="false"
+                    android:clickable="true"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha de salida"
+                    android:textColor="#AAAAAA"/>
+                <EditText
+                    android:id="@+id/til_fecha_salida"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="dd/mm/aaaa"
+                    android:textColor="#AAAAAA"
+                    android:backgroundTint="#555555"
+                    android:focusable="false"
+                    android:clickable="true"/>
+            </LinearLayout>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_fecha_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Campo obligatorio"
+            android:textColor="#FF5252"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Costo"
+            android:textColor="#AAAAAA"/>
+        <EditText
+            android:id="@+id/til_costo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:text="0"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#555555"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado de pago"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+        <RadioGroup
+            android:id="@+id/rg_estado_pago"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rb_pagado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pagado"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:checked="true"/>
+            <RadioButton
+                android:id="@+id/rb_no_pagado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No pagado"
+                android:textColor="@android:color/white"
+                android:buttonTint="@android:color/white"
+                android:layout_marginStart="16dp"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notas"
+            android:textColor="#AAAAAA"/>
+        <EditText
+            android:id="@+id/til_notas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:gravity="top"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#555555"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp">
+
+            <Button
+                android:id="@+id/btn_guardar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="GUARDAR"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btn_cancelar"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="CANCELAR"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="#AAAAAA"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

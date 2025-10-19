@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.play.services.location)
+    implementation(libs.legacy.support.v4)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
@@ -54,4 +55,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("org.osmdroid:osmdroid-wms:6.1.18")
+    implementation("com.google.android.material:material:1.10.0")
 }

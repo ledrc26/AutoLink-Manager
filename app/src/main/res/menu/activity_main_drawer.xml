@@ -34,6 +34,11 @@
             android:id="@+id/nav_assign_agency"
             android:icon="@drawable/ic_menu_camera"
             android:title="Asignar agencia" />
+
+        <item
+            android:id="@+id/nav_add_car"
+            android:icon="@drawable/outline_directions_car_24"
+            android:title="Agregar automovil" />
     </group>
 
     <item

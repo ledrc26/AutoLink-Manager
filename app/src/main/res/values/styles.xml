@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="StatCard" parent="Widget.MaterialComponents.CardView">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -112,11 +113,214 @@
     </style>
 
     <style name="StatusChip.Pagado" parent="StatusChip">
-        <item name="chipBackgroundColor">#2E7D32</item> <item name="android:textColor">@android:color/white</item>
+        <item name="chipBackgroundColor">#2E7D32</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="StatusChip.Pendiente" parent="StatusChip">
-        <item name="chipBackgroundColor">#444444</item> <item name="android:textColor">#AAAAAA</item>
+        <item name="chipBackgroundColor">#444444</item>
+        <item name="android:textColor">#AAAAAA</item>
+    </style>
+
+    <style name="FormTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:textColorHint">#AAAAAA</item>
+        <item name="boxStrokeColor">#555555</item>
+        <item name="hintTextColor">#AAAAAA</item>
+    </style>
+
+    <style name="FormSectionTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="FormImageButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="strokeColor">#555555</item>
+        <item name="iconTint">#AAAAAA</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">8dp</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <style name="FormInfoText" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="ServiceCard" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="cardBackgroundColor">#222222</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="ServiceCardContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">20dp</item>
+    </style>
+
+    <style name="ServiceCardIcon">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:tint">#33B5E5</item>
+    </style>
+
+    <style name="ServiceCardTextLayout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+
+    <style name="ServiceCardTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ServiceCardSubtitle" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
+    <style name="FormRadioButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="MapLabelText" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="MapPreviewCard" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="cardBackgroundColor">#222222</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="strokeColor">#555555</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="WarningBannerCard" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">24dp</item>
+    </style>
+
+    <style name="FormSectionTitleBasic">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
+    <style name="FormLabelBasic">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="FormEditTextBasic">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorHint">#888888</item>
+        <item name="android:backgroundTint">#555555</item> <item name="android:paddingBottom">12dp</item>
+    </style>
+
+    <style name="FormFieldContainerBasic">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="FormRadioButtonBasic">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:buttonTint">@android:color/white</item>
+    </style>
+
+    <style name="WarningBannerContent">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="WarningBannerIcon">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
+    </style>
+
+    <style name="WarningBannerText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#AAAAAA</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="FormButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+
+    <style name="FormButton.Primary" parent="FormButton">
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="FormButton.Secondary" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:textColor">#AAAAAA</item>
     </style>
 
 </resources>
