@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_margin="8dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="vertical" android:padding="12dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:textStyle="bold" android:textSize="16sp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Nombre de la agencia"/>
+
+        <TextView
+            android:id="@+id/tvPhone"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tel: -" android:layout_marginTop="2dp"/>
+
+        <TextView
+            android:id="@+id/tvCoords"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Lat,Lng" android:textSize="12sp"
+            android:layout_marginTop="2dp"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Editar"/>
+
+            <View
+                android:layout_width="8dp" android:layout_height="0dp"/>
+
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Borrar"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
