@@ -140,4 +140,21 @@
             android:name="vehicle_doc_id"
             app:argType="string" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_calendar"
+        android:name="com.example.autolinkmanager.ui.calendar.CalendarFragment"
+        android:label="Calendario de Servicios"
+        tools:layout="@layout/fragment_calendar" >
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_car_details"
+            app:destination="@id/nav_car_details" >
+            <argument
+                android:name="vehicle_doc_id"
+                app:argType="string" />
+        </action>
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_add_car"
+            app:destination="@id/nav_add_car" />
+    </fragment>
 </navigation>

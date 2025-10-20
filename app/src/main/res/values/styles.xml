@@ -51,6 +51,30 @@
         <item name="cardElevation">0dp</item>
     </style>
 
+    <style name="CalendarHeader" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="CalendarDateText" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">#DDDDDD</item>
+    </style>
+    <style name="CalendarWeekDayText" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#AAAAAA</item>
+    </style>
+
+    <style name="CalendarWidgetTheme" parent="android:Widget.CalendarView">
+        <item name="android:focusedMonthDateColor">@android:color/white</item>
+        <item name="android:unfocusedMonthDateColor">#888888</item>
+        <item name="android:weekDayTextAppearance">@style/CalendarWeekDayTextDark</item>
+        <item name="android:dateTextAppearance">@style/CalendarDateTextDark</item>
+        <item name="android:selectedWeekBackgroundColor">#3300BCD4</item> </style>
+
+    <style name="CalendarWeekDayTextDark" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">#AAAAAA</item>
+    </style>
+    <style name="CalendarDateTextDark" parent="android:TextAppearance.DeviceDefault.Medium">
+        <item name="android:textColor">#DDDDDD</item>
+    </style>
+
     <style name="ActionCardContent">
         <item name="android:orientation">vertical</item>
         <item name="android:layout_width">match_parent</item>
