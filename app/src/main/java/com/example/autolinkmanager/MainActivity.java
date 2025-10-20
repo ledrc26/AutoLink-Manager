@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -32,7 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private boolean isAdmin = false; //
+    private boolean isAdmin = false;
+
+    private boolean initialNavDone = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
+                R.id.nav_home, R.id.nav_gallery,
                 R.id.nav_create_agency, R.id.nav_agencies_map, R.id.nav_assign_agency,
                 R.id.nav_manage_agencies, R.id.nav_add_car, R.id.nav_car_list
         ).setOpenableLayout(drawer).build();
@@ -63,11 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
+        navigationView.getMenu().findItem(R.id.nav_home).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_gallery).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_assign_agency).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_add_car).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_car_list).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_calendar).setVisible(false);
 
         showAdminItemsIfNeeded();
 
@@ -97,30 +105,77 @@ public class MainActivity extends AppCompatActivity {
             return handled;
         });
     }
-
     private void showAdminItemsIfNeeded() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) return;
 
         String uid = user.getUid();
+        final NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
 
         db.collection("users").document(uid).get()
                 .addOnSuccessListener(snap -> {
                     String role = snap.getString("role");
                     isAdmin = "admin".equalsIgnoreCase(role);
 
-                    binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(isAdmin);
-                    binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(isAdmin);
-                    binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(isAdmin);
-                    binding.navView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(isAdmin);
+                    // Visibilidad de menús
+                    boolean adminVisible = isAdmin;
+                    binding.navView.getMenu().findItem(R.id.nav_gallery).setVisible(adminVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(adminVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(adminVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(adminVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(adminVisible);
+
+                    boolean userVisible = !isAdmin;
+                    binding.navView.getMenu().findItem(R.id.nav_home).setVisible(userVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_add_car).setVisible(userVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_car_list).setVisible(userVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_calendar).setVisible(userVisible);
+
+                    // 👉 Navegación inicial por rol (una sola vez)
+                    if (!initialNavDone) {
+                        int target = isAdmin ? R.id.nav_gallery : R.id.nav_home;
+
+                        // Evita navegar si ya estás en el destino
+                        if (navController.getCurrentDestination() == null
+                                || navController.getCurrentDestination().getId() != target) {
+
+                            NavOptions opts = new NavOptions.Builder()
+                                    .setPopUpTo(navController.getGraph().getStartDestinationId(), true) // limpia backstack al start
+                                    .setLaunchSingleTop(true)
+                                    .build();
+
+                            navController.navigate(target, null, opts);
+                        }
+                        initialNavDone = true;
+                    }
                 })
                 .addOnFailureListener(e -> {
+                    // Fallback: tratar como usuario-agencia
                     isAdmin = false;
+
+                    binding.navView.getMenu().findItem(R.id.nav_gallery).setVisible(false);
                     binding.navView.getMenu().findItem(R.id.nav_create_agency).setVisible(false);
                     binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(false);
                     binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(false);
+                    binding.navView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(false);
+
+                    binding.navView.getMenu().findItem(R.id.nav_home).setVisible(true);
+                    binding.navView.getMenu().findItem(R.id.nav_add_car).setVisible(true);
+                    binding.navView.getMenu().findItem(R.id.nav_car_list).setVisible(true);
+                    binding.navView.getMenu().findItem(R.id.nav_calendar).setVisible(true);
+
+                    if (!initialNavDone) {
+                        NavOptions opts = new NavOptions.Builder()
+                                .setPopUpTo(navController.getGraph().getStartDestinationId(), true)
+                                .setLaunchSingleTop(true)
+                                .build();
+                        navController.navigate(R.id.nav_home, null, opts);
+                        initialNavDone = true;
+                    }
                 });
     }
+
+
 
     private void logoutUser() {
         FirebaseAuth.getInstance().signOut();
