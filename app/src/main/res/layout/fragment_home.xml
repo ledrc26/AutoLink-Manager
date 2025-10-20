@@ -6,12 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context=".MainActivity">
-
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="?attr/actionBarSize"> <LinearLayout
+    tools:context=".ui.home.HomeFragment"> <androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -33,27 +31,39 @@
             android:weightSum="3"
             android:layout_marginBottom="12dp">
 
-            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_vehiculos"
+                style="@style/StatCard">
                 <LinearLayout style="@style/StatCardContent">
-                    <TextView style="@style/StatCardValue" android:text="2" />
+                    <TextView
+                        android:id="@+id/tv_vehiculos_registrados_value"
+                        style="@style/StatCardValue"
+                        tools:text="0" />
                     <TextView style="@style/StatCardTitle" android:text="Vehículos registrados" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_servicios" style="@style/StatCard">
                 <LinearLayout style="@style/StatCardContent">
-                    <TextView style="@style/StatCardValue" android:text="1" />
+                    <TextView
+                        android:id="@+id/tv_servicios_en_curso_value"
+                        style="@style/StatCardValue"
+                        tools:text="0" />
                     <TextView style="@style/StatCardTitle" android:text="Servicios en curso" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView style="@style/StatCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_pagos" style="@style/StatCard">
                 <LinearLayout style="@style/StatCardContent">
-                    <TextView style="@style/StatCardValue" android:text="1" />
+                    <TextView
+                        android:id="@+id/tv_pagos_pendientes_value"
+                        style="@style/StatCardValue"
+                        tools:text="0" />
                     <TextView style="@style/StatCardTitle" android:text="Pagos pendientes" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
 
         <LinearLayout
@@ -63,29 +73,32 @@
             android:weightSum="3"
             android:layout_marginBottom="16dp">
 
-            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_alta_vehiculo"
+                style="@style/ActionCard">
                 <LinearLayout style="@style/ActionCardContent">
-                    <ImageView style="@style/ActionCardIcon"
-                        android:src="@drawable/outline_add_24"
-                        android:contentDescription="Alta"/>
+                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_add_24" android:contentDescription="Alta"/>
                     <TextView style="@style/ActionCardText" android:text="Alta vehículo" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_ver_servicios"
+                style="@style/ActionCard">
                 <LinearLayout style="@style/ActionCardContent">
                     <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_list_alt_24" android:contentDescription="Ver"/>
                     <TextView style="@style/ActionCardText" android:text="Ver servicios" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView style="@style/ActionCard">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_cobros"
+                style="@style/ActionCard">
                 <LinearLayout style="@style/ActionCardContent">
                     <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_attach_money_24" android:contentDescription="Cobros"/>
                     <TextView style="@style/ActionCardText" android:text="Cobros" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
 
         <TextView
@@ -97,67 +110,26 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_movimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_recent_movement"
+            tools:itemCount="3"/>
 
-            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
-                <RelativeLayout style="@style/MovimientoItemContent">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true">
-                        <TextView style="@style/MovimientoItemTextMain" android:text="XYZ789" />
-                        <TextView style="@style/MovimientoItemTextSub" android:text="Modelo 3" />
-                    </LinearLayout>
-                    <com.google.android.material.chip.Chip
-                        style="@style/StatusChip.Pagado"
-                        android:text="Pagado" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
-                <RelativeLayout style="@style/MovimientoItemContent">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true">
-                        <TextView style="@style/MovimientoItemTextMain" android:text="ABC123" />
-                        <TextView style="@style/MovimientoItemTextSub" android:text="EcoSport" />
-                    </LinearLayout>
-                    <com.google.android.material.chip.Chip
-                        style="@style/StatusChip.Pendiente"
-                        android:text="Pendiente" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView style="@style/MovimientoItemCard">
-                <RelativeLayout style="@style/MovimientoItemContent">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true">
-                        <TextView style="@style/MovimientoItemTextMain" android:text="XYZ789" />
-                        <TextView style="@style/MovimientoItemTextSub" android:text="Modelo 3" />
-                    </LinearLayout>
-                    <com.google.android.material.chip.Chip
-                        style="@style/StatusChip.Pendiente"
-                        android:text="Pendiente" />
-                </RelativeLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_no_movements"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No hay movimientos recientes."
+            android:textColor="#AAAAAA"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
     </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-
-
+</androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

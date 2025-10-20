@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="#222222"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/tv_movement_plate"
+                style="@style/MovimientoItemTextMain"
+                tools:text="XYZ789" />
+
+            <TextView
+                android:id="@+id/tv_movement_model"
+                style="@style/MovimientoItemTextSub"
+                tools:text="Modelo 3" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_movement_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Pagado"
+            tools:background="@drawable/rounded_tag_active"
+            tools:textColor="@android:color/white"/>
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
