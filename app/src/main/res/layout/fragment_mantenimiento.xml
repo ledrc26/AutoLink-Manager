@@ -47,26 +47,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="4dp">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginEnd="8dp">
+            <LinearLayout style="@style/FormFieldContainerBasic">
+                <TextView style="@style/FormLabelBasic" android:text="Fecha de ingreso"/>
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Fecha de ingreso"
-                    android:textColor="#AAAAAA"/>
-                <EditText
-                    android:id="@+id/til_fecha_ingreso"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="dd/mm/aaaa"
-                    android:textColor="#AAAAAA"
-                    android:backgroundTint="#555555"
-                    android:focusable="false"
-                    android:clickable="true"/>
+                    android:id="@+id/tv_fecha_ingreso_hojalateria"
+                    style="@style/FormEditTextBasic"
+                    tools:text="03/11/2025"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"

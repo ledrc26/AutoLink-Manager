@@ -79,6 +79,7 @@ public class HomeFragment extends Fragment {
         tvServiciosEnCursoValue = view.findViewById(R.id.tv_servicios_en_curso_value);
         tvPagosPendientesValue = view.findViewById(R.id.tv_pagos_pendientes_value);
 
+
         // Inicializar Vistas de Acciones (CardViews)
         cardAltaVehiculo = view.findViewById(R.id.card_alta_vehiculo); // Necesitas añadir IDs
         cardVerServicios = view.findViewById(R.id.card_ver_servicios); // Necesitas añadir IDs

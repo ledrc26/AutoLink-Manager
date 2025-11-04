@@ -51,11 +51,11 @@ public class HojalateriaFragment extends Fragment {
     private LinearLayout layoutColorPicker;
     private View viewColorPreview;
     private TextView tvColorHex;
-    private EditText etFechaIngreso, etFechaSalida, etCosto, etNotas;
+    private TextView tvFechaIngreso; // << CAMBIO: De EditText a TextView
+    private EditText etFechaSalida, etCosto, etNotas;
     private RadioGroup rgEstadoPago;
-    private RadioButton rbNoPagado; // Need this for checking
+    private RadioButton rbNoPagado;
     private Button btnGuardar, btnCancelar;
-    // Add Buttons for camera/gallery if needed
 
     private FirebaseFirestore db;
     private SimpleDateFormat dateFormatter;
@@ -94,29 +94,31 @@ public class HojalateriaFragment extends Fragment {
         layoutColorPicker = view.findViewById(R.id.layout_color_picker);
         viewColorPreview = view.findViewById(R.id.view_color_preview);
         tvColorHex = view.findViewById(R.id.tv_color_hex);
-        etFechaIngreso = view.findViewById(R.id.et_fecha_ingreso_hojalateria);
+        tvFechaIngreso = view.findViewById(R.id.tv_fecha_ingreso_hojalateria); // << CAMBIO: Nuevo ID
         etFechaSalida = view.findViewById(R.id.et_fecha_salida_hojalateria);
         etCosto = view.findViewById(R.id.et_costo_hojalateria);
         etNotas = view.findViewById(R.id.et_notas_hojalateria);
         rgEstadoPago = view.findViewById(R.id.rg_estado_pago_hojalateria);
-        rbNoPagado = view.findViewById(R.id.rb_no_pagado_hojalateria); // Initialize this
+        rbNoPagado = view.findViewById(R.id.rb_no_pagado_hojalateria);
         btnGuardar = view.findViewById(R.id.btn_guardar_hojalateria);
         btnCancelar = view.findViewById(R.id.btn_cancelar_hojalateria);
-        // Initialize camera/gallery buttons if you have them
 
         // Set default color preview
         viewColorPreview.setBackgroundColor(Color.parseColor("#" + selectedColorHex));
         tvColorHex.setText(selectedColorHex);
 
+        // --- CAMBIO: Establecer la fecha actual automáticamente ---
+        String fechaActual = dateFormatter.format(new Date());
+        tvFechaIngreso.setText(fechaActual);
+        // --------------------------------------------------------
+
         // --- Setup Listeners ---
-        etFechaIngreso.setOnClickListener(v -> showDatePickerDialog(etFechaIngreso));
+        // << CAMBIO: Se elimina el listener para la fecha de ingreso
         etFechaSalida.setOnClickListener(v -> showDatePickerDialog(etFechaSalida));
-        layoutColorPicker.setOnClickListener(v -> openColorPicker()); // Method to open a color picker dialog
+        layoutColorPicker.setOnClickListener(v -> openColorPicker());
 
         btnGuardar.setOnClickListener(v -> guardarDatosEnFirebase());
         btnCancelar.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-
-        // Add listeners for camera/gallery buttons if needed
     }
 
     private void showDatePickerDialog(final EditText editText) {
@@ -135,34 +137,25 @@ public class HojalateriaFragment extends Fragment {
     }
 
     private void openColorPicker() {
-        // Define tus opciones de color (Hex string)
         final String[] colorHexOptions = {"FF0000", "00FF00", "0000FF", "FFFF00", "FF00FF", "00FFFF", "FFFFFF", "000000", "4CAF50"};
-        final String[] colorNames = {"Rojo", "Verde", "Azul", "Amarillo", "Magenta", "Cyan", "Blanco", "Negro"}; // Nombres opcionales
+        final String[] colorNames = {"Rojo", "Verde", "Azul", "Amarillo", "Magenta", "Cyan", "Blanco", "Negro", "Verde Material"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Selecciona un color");
 
-        // Crea una lista simple para mostrar los colores
         builder.setItems(colorNames, (dialog, which) -> {
-            // 'which' es el índice del color seleccionado
             selectedColorHex = colorHexOptions[which];
-
-            // Actualiza la UI
             try {
-                // Añade '#' si no lo tiene, parseColor lo necesita
                 String colorString = selectedColorHex.startsWith("#") ? selectedColorHex : "#" + selectedColorHex;
                 viewColorPreview.setBackgroundColor(Color.parseColor(colorString));
-                tvColorHex.setText(selectedColorHex); // Muestra el hex sin '#'
+                tvColorHex.setText(selectedColorHex);
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Color hex inválido: " + selectedColorHex, e);
-                // Mantener el color anterior o poner uno por defecto
             }
         });
 
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.create().show();
     }
 
 
@@ -181,23 +174,21 @@ public class HojalateriaFragment extends Fragment {
             }
         }
 
-        String fechaIngresoStr = etFechaIngreso.getText().toString().trim();
+        String fechaIngresoStr = tvFechaIngreso.getText().toString().trim(); // << CAMBIO: Obtener de TextView
         String fechaSalidaStr = etFechaSalida.getText().toString().trim();
         String costoStr = etCosto.getText().toString().trim();
         String notas = etNotas.getText().toString().trim();
-        boolean isPagado = !rbNoPagado.isChecked(); // If 'No pagado' is NOT checked, then it's 'Pagado'
+        boolean isPagado = !rbNoPagado.isChecked();
 
         // --- Validation ---
         if (selectedChips.isEmpty()) {
             Toast.makeText(getContext(), "Selecciona al menos un tipo de trabajo.", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (fechaIngresoStr.isEmpty() || fechaIngresoStr.equals("dd/mm/aaaa")) {
-            Toast.makeText(getContext(), "Ingresa la fecha de ingreso.", Toast.LENGTH_SHORT).show();
-            // Show error state on etFechaIngreso if needed
+        if (fechaIngresoStr.isEmpty()) { // La validación de "dd/mm/aaaa" ya no es necesaria
+            Toast.makeText(getContext(), "La fecha de ingreso no puede estar vacía.", Toast.LENGTH_SHORT).show();
             return;
         }
-        // Add more validation if needed (cost, etc.)
 
         Date fechaIngreso = null;
         Date fechaSalida = null;
@@ -223,8 +214,6 @@ public class HojalateriaFragment extends Fragment {
 
         // 2. CREATE THE COMPLETE Hojalateria OBJECT
         Hojalateria hojalateria = new Hojalateria();
-
-        // --- Copy data from Auto ---
         hojalateria.setPlaca(auto.getPlaca());
         hojalateria.setModelo(auto.getModelo());
         hojalateria.setAnio(auto.getAnio());
@@ -232,10 +221,8 @@ public class HojalateriaFragment extends Fragment {
         hojalateria.setTelefonoPropietario(auto.getTelefonoPropietario());
         hojalateria.setFotoBase64(auto.getFotoBase64());
         hojalateria.setAgencyId(auto.getAgencyId());
-
-        // --- Add Hojalateria specific data ---
         hojalateria.setTiposTrabajo(selectedChips);
-        hojalateria.setColorHex(selectedColorHex); // From the color picker logic
+        hojalateria.setColorHex(selectedColorHex);
         hojalateria.setFechaIngreso(fechaIngreso);
         hojalateria.setFechaSalida(fechaSalida);
         hojalateria.setCosto(costo);
@@ -246,12 +233,13 @@ public class HojalateriaFragment extends Fragment {
         Toast.makeText(getContext(), "Guardando...", Toast.LENGTH_SHORT).show();
 
         db.collection("agencies").document(agencyId)
-                .collection("vehicles") // Save the complete Hojalateria object
+                .collection("vehicles")
                 .add(hojalateria)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "¡Servicio de Hojalatería guardado!", Toast.LENGTH_SHORT).show();
-                    // Navigate back to home (replace R.id.nav_home with your home destination ID)
-                    Navigation.findNavController(requireView()).popBackStack(R.id.nav_home, false);
+                    if (getView() != null) {
+                        Navigation.findNavController(getView()).popBackStack();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();

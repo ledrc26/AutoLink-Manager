@@ -44,7 +44,8 @@ public class MantenimientoFragment extends Fragment {
 
     // Vistas
     private Spinner tilTipoMantenimiento;
-    private EditText tilFechaIngreso, tilFechaSalida, tilCosto, tilNotas;
+    private TextView tvFechaIngreso;
+    private EditText  tilFechaSalida, tilCosto, tilNotas;
     private TextView tvTipoError, tvFechaError;
     private RadioGroup rgEstadoPago;
     private RadioButton rbPagado;
@@ -61,7 +62,6 @@ public class MantenimientoFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-        // Gracias al <argument> en el XML, esto ya no crashea
         if (getArguments() != null) {
             serviceType = getArguments().getString("SERVICE_TYPE");
             auto = (Auto) getArguments().getSerializable("auto_data");
@@ -82,7 +82,7 @@ public class MantenimientoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         tilTipoMantenimiento = view.findViewById(R.id.til_tipo_mantenimiento);
-        tilFechaIngreso = view.findViewById(R.id.til_fecha_ingreso);
+        tvFechaIngreso = view.findViewById(R.id.tv_fecha_ingreso_hojalateria);
         tilFechaSalida = view.findViewById(R.id.til_fecha_salida);
         tilCosto = view.findViewById(R.id.til_costo);
         tilNotas = view.findViewById(R.id.til_notas);
@@ -101,8 +101,13 @@ public class MantenimientoFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tilTipoMantenimiento.setAdapter(adapter);
 
+        // --- CAMBIO 1: Poner la fecha actual automáticamente ---
+        String fechaActual = dateFormatter.format(new Date());
+        tvFechaIngreso.setText(fechaActual);
+
         // --- Configurar DatePickers ---
-        tilFechaIngreso.setOnClickListener(v -> showDatePickerDialog(tilFechaIngreso));
+        // --- CAMBIO 2: Se elimina el OnClickListener para la fecha de ingreso ---
+        // tilFechaIngreso.setOnClickListener(v -> showDatePickerDialog(tilFechaIngreso));
         tilFechaSalida.setOnClickListener(v -> showDatePickerDialog(tilFechaSalida));
 
         btnGuardar.setOnClickListener(v -> guardarDatosEnFirebase());
@@ -132,7 +137,7 @@ public class MantenimientoFragment extends Fragment {
 
         // 1. OBTENER DATOS DE MANTENIMIENTO
         String tipoMantenimiento = tilTipoMantenimiento.getSelectedItem().toString();
-        String fechaIngresoStr = tilFechaIngreso.getText().toString().trim();
+        String fechaIngresoStr = tvFechaIngreso.getText().toString().trim();
         String fechaSalidaStr = tilFechaSalida.getText().toString().trim();
         String costoStr = tilCosto.getText().toString().trim();
         String notas = tilNotas.getText().toString().trim();
@@ -148,7 +153,9 @@ public class MantenimientoFragment extends Fragment {
             tvTipoError.setVisibility(View.VISIBLE);
             esValido = false;
         }
-        if (fechaIngresoStr.isEmpty() || fechaIngresoStr.equals("dd/mm/aaaa")) {
+
+        // La validación de "dd/mm/aaaa" ya no es necesaria, solo la de vacío
+        if (fechaIngresoStr.isEmpty()) {
             tvFechaError.setVisibility(View.VISIBLE);
             esValido = false;
         }
@@ -200,13 +207,15 @@ public class MantenimientoFragment extends Fragment {
         // 3. GUARDAR EL OBJETO COMPLETO EN FIREBASE
         Toast.makeText(getContext(), "Guardando...", Toast.LENGTH_SHORT).show();
 
+        // Asegúrate de que R.id.nav_home es el ID correcto
         db.collection("agencies").document(agencyId)
                 .collection("vehicles")
                 .add(mantenimiento)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "¡Vehículo y Servicio guardados!", Toast.LENGTH_SHORT).show();
-                    // Regresa al inicio (nav_home)
-                    Navigation.findNavController(requireView()).popBackStack(R.id.nav_home, false);
+                    if (getView() != null) {
+                        Navigation.findNavController(requireView()).popBackStack(R.id.nav_home, false);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
