@@ -1,6 +1,5 @@
 package com.example.autolinkmanager.ui.gallery;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,33 +11,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.autolinkmanager.R;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GalleryFragment extends Fragment {
 
     private FirebaseFirestore db;
 
-    private TextView tvTotalAgencias, tvServiciosPend, tvTotalPendienteMx;
+    private TextView tvTotalAgencias, tvServiciosPend;
     private MaterialCardView cardCrear, cardMapa;
-    private RecyclerView rvMovs;
-    private TextView tvNoMovs;
-
-    private final List<RecentMovementItem> movementItems = new ArrayList<>();
-    private RecentMovementsAdapter movementsAdapter;
-
-    private final NumberFormat currencyMx = NumberFormat.getCurrencyInstance(new Locale("es","MX"));
 
     @Nullable
     @Override
@@ -54,162 +41,109 @@ public class GalleryFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        tvTotalAgencias   = v.findViewById(R.id.tv_total_agencias);
-        tvServiciosPend   = v.findViewById(R.id.tv_servicios_pendientes);
-        tvTotalPendienteMx= v.findViewById(R.id.tv_total_pendiente_mx);
+        tvTotalAgencias = v.findViewById(R.id.tv_total_agencias);
+        tvServiciosPend = v.findViewById(R.id.tv_servicios_pendientes);
 
-        cardCrear         = v.findViewById(R.id.card_crear_agencia);
-        cardMapa          = v.findViewById(R.id.card_mapa_agencias);
+        cardCrear = v.findViewById(R.id.card_crear_agencia);
+        cardMapa  = v.findViewById(R.id.card_mapa_agencias);
 
-        rvMovs            = v.findViewById(R.id.recycler_view_movimientos);
-        tvNoMovs          = v.findViewById(R.id.tv_no_movements);
-
-        rvMovs.setLayoutManager(new LinearLayoutManager(getContext()));
-        movementsAdapter = new RecentMovementsAdapter(movementItems);
-        rvMovs.setAdapter(movementsAdapter);
-
-        // Navegación a pantallas de admin
+        // Navegación (se conserva tal cual)
         if (cardCrear != null) {
             cardCrear.setOnClickListener(x ->
-                    Navigation.findNavController(x).navigate(R.id.nav_create_agency));
+                    Navigation.findNavController(x).navigate(R.id.nav_create_agency)
+            );
         }
         if (cardMapa != null) {
             cardMapa.setOnClickListener(x ->
-                    Navigation.findNavController(x).navigate(R.id.nav_agencies_map));
+                    Navigation.findNavController(x).navigate(R.id.nav_agencies_map)
+            );
         }
 
-        loadDashboard();
+        loadMetrics();
     }
 
-    private void loadDashboard() {
+    private void loadMetrics() {
         loadTotalAgencies();
-        loadPendingServicesCount();
-        loadPendingPaymentsSum();
-        loadRecentServices();
+        loadPendingServicesWithoutIndexAtomic();
     }
 
-    // 1) Total de agencias (colección agencies)
+    // Total de agencias
     private void loadTotalAgencies() {
         db.collection("agencies")
                 .get()
-                .addOnSuccessListener(snap -> {
-                    tvTotalAgencias.setText(String.valueOf(snap.size()));
-                })
-                .addOnFailureListener(e ->
-                        toast("Error total agencias: " + e.getMessage()));
+                .addOnSuccessListener(snap ->
+                        tvTotalAgencias.setText(String.valueOf(snap.size()))
+                )
+                .addOnFailureListener(e -> toast("Error total agencias: " + e.getMessage()));
     }
 
-    // 2) Servicios pendientes (global): vehicles con pagado == false
-    private void loadPendingServicesCount() {
-        db.collectionGroup("vehicles")
-                .whereEqualTo("pagado", false)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    tvServiciosPend.setText(String.valueOf(snap.size()));
-                })
-                .addOnFailureListener(e ->
-                        toast("Error servicios pendientes: " + e.getMessage()));
-    }
+    // Servicios pendientes: vehicles con pagado == false (en todas las agencias)
+    private void loadPendingServicesWithoutIndexAtomic() {
+        tvServiciosPend.setText("0");
+        TextView tvTotalPendienteMx = getView().findViewById(R.id.tv_total_pendiente_mx);
+        if (tvTotalPendienteMx != null) tvTotalPendienteMx.setText("$0");
 
-    // 3) Total $ pendiente (global): suma costo donde pagado == false
-    private void loadPendingPaymentsSum() {
-        db.collectionGroup("vehicles")
-                .whereEqualTo("pagado", false)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    double total = 0.0;
-                    for (QueryDocumentSnapshot d : snap) {
-                        Double costo = d.getDouble("costo");
-                        if (costo != null) total += costo;
+        db.collection("agencies").get()
+                .addOnSuccessListener(agenciesSnap -> {
+                    int n = agenciesSnap.size();
+                    if (n == 0) {
+                        tvServiciosPend.setText("0");
+                        if (tvTotalPendienteMx != null) tvTotalPendienteMx.setText("$0");
+                        return;
                     }
-                    tvTotalPendienteMx.setText(currencyMx.format(total));
-                })
-                .addOnFailureListener(e ->
-                        toast("Error total pendiente: " + e.getMessage()));
-    }
 
-    // 4) Últimas altas globales (ordenar por fechaIngreso)
-    private void loadRecentServices() {
-        movementItems.clear();
-        db.collectionGroup("vehicles")
-                .orderBy("fechaIngreso", Query.Direction.DESCENDING)
-                .limit(5)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    for (QueryDocumentSnapshot d : snap) {
-                        String placa  = d.getString("placa");
-                        String modelo = d.getString("modelo");
-                        Boolean pagado = d.getBoolean("pagado");
-                        String status = (pagado != null && pagado) ? "Pagado" : "Pendiente";
-                        movementItems.add(new RecentMovementItem(placa, modelo, status));
+                    AtomicInteger totalCount = new AtomicInteger(0);
+                    AtomicReference<Double> totalMonto = new AtomicReference<>(0.0);
+                    AtomicInteger remaining = new AtomicInteger(n);
+
+                    for (DocumentSnapshot agency : agenciesSnap.getDocuments()) {
+                        db.collection("agencies").document(agency.getId())
+                                .collection("vehicles")
+                                .whereEqualTo("pagado", false)
+                                .get()
+                                .addOnSuccessListener(qs -> {
+                                    // suma cantidad de servicios
+                                    totalCount.addAndGet(qs.size());
+                                    // suma el costo total
+                                    double subtotal = 0.0;
+                                    for (DocumentSnapshot doc : qs.getDocuments()) {
+                                        Double costo = doc.getDouble("costo");
+                                        if (costo != null) subtotal += costo;
+                                    }
+                                    totalMonto.set(totalMonto.get() + subtotal);
+
+                                    // cuando terminen todas las agencias
+                                    if (remaining.decrementAndGet() == 0) {
+                                        tvServiciosPend.setText(String.valueOf(totalCount.get()));
+
+                                        if (tvTotalPendienteMx != null) {
+                                            java.text.NumberFormat mxn = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("es", "MX"));
+                                            tvTotalPendienteMx.setText(mxn.format(totalMonto.get()));
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    if (remaining.decrementAndGet() == 0) {
+                                        tvServiciosPend.setText(String.valueOf(totalCount.get()));
+                                        if (tvTotalPendienteMx != null) {
+                                            java.text.NumberFormat mxn = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("es", "MX"));
+                                            tvTotalPendienteMx.setText(mxn.format(totalMonto.get()));
+                                        }
+                                    }
+                                    toast("Error en agencia: " + e.getMessage());
+                                });
                     }
-                    updateMovementsUI();
                 })
                 .addOnFailureListener(e -> {
-                    tvNoMovs.setVisibility(View.VISIBLE);
-                    rvMovs.setVisibility(View.GONE);
-                    tvNoMovs.setText("Error al cargar altas.");
+                    toast("Error listando agencias: " + e.getMessage());
+                    tvServiciosPend.setText("0");
+                    if (tvTotalPendienteMx != null) tvTotalPendienteMx.setText("$0");
                 });
     }
 
-    private void updateMovementsUI() {
-        if (movementItems.isEmpty()) {
-            rvMovs.setVisibility(View.GONE);
-            tvNoMovs.setVisibility(View.VISIBLE);
-        } else {
-            tvNoMovs.setVisibility(View.GONE);
-            rvMovs.setVisibility(View.VISIBLE);
-            movementsAdapter.notifyDataSetChanged();
-        }
-    }
-
     private void toast(String m) {
-        if (getContext() != null) Toast.makeText(getContext(), m, Toast.LENGTH_SHORT).show();
-    }
-
-    // --- modelos/adapter para el Recycler ---
-    public static class RecentMovementItem {
-        public final String placa;
-        public final String modelo;
-        public final String status;
-        public RecentMovementItem(String placa, String modelo, String status) {
-            this.placa = placa; this.modelo = modelo; this.status = status;
-        }
-    }
-
-    public static class RecentMovementsAdapter extends RecyclerView.Adapter<RecentMovementsAdapter.VH> {
-        private final List<RecentMovementItem> items;
-        public RecentMovementsAdapter(List<RecentMovementItem> items) { this.items = items; }
-
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int v) {
-            View view = LayoutInflater.from(p.getContext()).inflate(R.layout.item_recent_movement, p, false);
-            return new VH(view);
-        }
-
-        @Override public void onBindViewHolder(@NonNull VH h, int pos) {
-            RecentMovementItem it = items.get(pos);
-            h.tvPlaca.setText(it.placa != null ? it.placa : "—");
-            h.tvModelo.setText(it.modelo != null ? it.modelo : "—");
-            h.tvStatus.setText(it.status);
-            if ("Pagado".equalsIgnoreCase(it.status)) {
-                h.tvStatus.setBackgroundResource(R.drawable.rounded_tag_active);
-                h.tvStatus.setTextColor(Color.WHITE);
-            } else {
-                h.tvStatus.setBackgroundResource(R.drawable.rounded_tag_pending);
-                h.tvStatus.setTextColor(Color.WHITE);
-            }
-        }
-
-        @Override public int getItemCount() { return items.size(); }
-
-        static class VH extends RecyclerView.ViewHolder {
-            final TextView tvPlaca, tvModelo, tvStatus;
-            VH(@NonNull View v) {
-                super(v);
-                tvPlaca  = v.findViewById(R.id.tv_movement_plate);
-                tvModelo = v.findViewById(R.id.tv_movement_model);
-                tvStatus = v.findViewById(R.id.tv_movement_status);
-            }
+        if (getContext() != null) {
+            Toast.makeText(getContext(), m, Toast.LENGTH_SHORT).show();
         }
     }
 }
