@@ -18,7 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#1F1F1F"
-            android:theme="@style/CalendarWidgetTheme" /> <View
+            android:weekDayTextAppearance="@style/CalendarWeekDayTextDark"
+            android:dateTextAppearance="@style/CalendarDateTextDark"
+            android:focusedMonthDateColor="@android:color/white"
+            android:unfocusedMonthDateColor="#888888"
+            android:selectedWeekBackgroundColor="#3300BCD4"
+            android:weekSeparatorLineColor="#333333"
+            android:showWeekNumber="false"/>
+        <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#333333"

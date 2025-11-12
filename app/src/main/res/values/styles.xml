@@ -61,7 +61,23 @@
         <item name="android:textColor">#AAAAAA</item>
     </style>
 
+    <style name="CalendarWidgetTheme.WhiteHeader" parent="android:Widget.CalendarView">
+        <!-- Días del mes -->
+        <item name="android:numbersTextColor">@android:color/white</item>
+        <item name="android:focusedMonthDateColor">@android:color/white</item>
+        <item name="android:unfocusedMonthDateColor">#888888</item>
+        <item name="android:weekDayTextAppearance">@style/CalendarWeekDayTextDark</item>
+        <item name="android:dateTextAppearance">@style/CalendarDateTextDark</item>
+        <item name="android:selectedWeekBackgroundColor">#3300BCD4</item>
+
+        <item name="android:calendarTextColor">@android:color/white</item>
+
+        <item name="android:weekSeparatorLineColor">#333333</item>
+    </style>
+
+
     <style name="CalendarWidgetTheme" parent="android:Widget.CalendarView">
+        <item name="android:numbersTextColor">@android:color/white</item>
         <item name="android:focusedMonthDateColor">@android:color/white</item>
         <item name="android:unfocusedMonthDateColor">#888888</item>
         <item name="android:weekDayTextAppearance">@style/CalendarWeekDayTextDark</item>
