@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3"
+            android:weightSum="2"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.card.MaterialCardView
@@ -88,15 +88,6 @@
                 <LinearLayout style="@style/ActionCardContent">
                     <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_list_alt_24" android:contentDescription="Ver"/>
                     <TextView style="@style/ActionCardText" android:text="Ver servicios" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_cobros"
-                style="@style/ActionCard">
-                <LinearLayout style="@style/ActionCardContent">
-                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_attach_money_24" android:contentDescription="Cobros"/>
-                    <TextView style="@style/ActionCardText" android:text="Cobros" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

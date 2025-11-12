@@ -83,7 +83,6 @@ public class HomeFragment extends Fragment {
         // Inicializar Vistas de Acciones (CardViews)
         cardAltaVehiculo = view.findViewById(R.id.card_alta_vehiculo); // Necesitas añadir IDs
         cardVerServicios = view.findViewById(R.id.card_ver_servicios); // Necesitas añadir IDs
-        cardCobros = view.findViewById(R.id.card_cobros);           // Necesitas añadir IDs
 
         // Inicializar RecyclerView y Adapter
         recyclerViewMovimientos = view.findViewById(R.id.recycler_view_movimientos); // Necesitas añadir ID al LinearLayout contenedor
@@ -114,7 +113,6 @@ public class HomeFragment extends Fragment {
 
         cardAltaVehiculo = view.findViewById(R.id.card_alta_vehiculo); // Añade IDs a las ActionCards
         cardVerServicios = view.findViewById(R.id.card_ver_servicios);
-        cardCobros = view.findViewById(R.id.card_cobros);
 
         recyclerViewMovimientos = view.findViewById(R.id.recycler_view_movimientos); // Añade ID al LinearLayout de movimientos
         tvNoMovements = view.findViewById(R.id.tv_no_movements); // Añade este TextView bajo el título "Últimos movimientos"

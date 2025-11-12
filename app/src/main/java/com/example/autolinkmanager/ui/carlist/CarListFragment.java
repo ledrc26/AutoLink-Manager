@@ -52,8 +52,8 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
 
     private RecyclerView recyclerView;
     private CarAdapter carAdapter;
-    private List<CarListItem> carListItems;
-    private List<CarListItem> allCarListItems;
+    private List<CarListItem> carListItems; // La lista que ve el Adapter
+    private List<CarListItem> allCarListItems; // La lista maestra con todos los carros
     private SearchView searchView;
 
     public CarListFragment() {}
@@ -79,7 +79,9 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
 
         recyclerView = view.findViewById(R.id.recycler_view_car_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Pass 'this' as the listener
+
+        // El Adapter se crea con la lista 'carListItems'.
+        // Esta lista persistirá mientras el Fragmento exista (no solo su vista)
         carAdapter = new CarAdapter(carListItems, this);
         recyclerView.setAdapter(carAdapter);
 
@@ -114,18 +116,26 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
         } else { /* Handle not logged in */ }
     }
 
+    // --- MÉTODO LOADCARS() CORREGIDO ---
     private void loadCars() {
-        if (currentAgencyId == null) return;
+        if (currentAgencyId == null) {
+            Log.w(TAG, "currentAgencyId es nulo, no se pueden cargar autos.");
+            return;
+        }
 
         db.collection("agencies").document(currentAgencyId)
                 .collection("vehicles")
                 .orderBy("placa", Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        carListItems.clear();
-                        allCarListItems.clear();
-                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                    // Comprueba si la tarea fue exitosa Y si el resultado no es nulo
+                    if (task.isSuccessful() && task.getResult() != null) {
+
+                        // 1. Crea listas temporales para los nuevos datos
+                        List<CarListItem> newItems = new ArrayList<>();
+                        List<CarListItem> newAllItems = new ArrayList<>();
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
                             String placa = document.getString("placa");
                             String modelo = document.getString("modelo");
                             Long anioLong = document.getLong("anio");
@@ -134,36 +144,64 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
                             String serviceStatus = (pagado != null && pagado) ? "Pagado" : "Pendiente"; // Changed text
 
                             CarListItem item = new CarListItem(document.getId(), placa, modelo, anio, serviceStatus);
-                            carListItems.add(item);
-                            allCarListItems.add(item);
+                            newItems.add(item);
+                            newAllItems.add(item);
                         }
+
+                        // 2. SOLO AHORA, borra las listas viejas
+                        carListItems.clear();
+                        allCarListItems.clear();
+
+                        // 3. Agrega los nuevos datos
+                        carListItems.addAll(newItems);
+                        allCarListItems.addAll(newAllItems);
+
+                        // 4. Notifica al adapter
                         carAdapter.notifyDataSetChanged();
-                        // Optional: Show message if list is empty
-                    } else { /* Handle error loading cars */ }
+
+                        // Opcional: Muestra mensaje si la lista (ahora llena) está vacía
+                        if (newItems.isEmpty() && getContext() != null) {
+                            Toast.makeText(getContext(), "No se encontraron vehículos.", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        // 5. Maneja el error
+                        Log.e(TAG, "Error al cargar vehículos: ", task.getException());
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Error al cargar vehículos.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 });
     }
 
+    // --- MÉTODO FILTERCARS() CORREGIDO ---
     private void filterCars(String query) {
         List<CarListItem> filteredList = new ArrayList<>();
+
         if (query == null || query.isEmpty()) {
-            filteredList.addAll(allCarListItems);
+            filteredList.addAll(allCarListItems); // Carga todo desde la lista maestra
         } else {
             String lowerCaseQuery = query.toLowerCase();
-            for (CarListItem item : allCarListItems) {
+            for (CarListItem item : allCarListItems) { // Filtra desde la lista maestra
                 if ((item.getPlaca() != null && item.getPlaca().toLowerCase().contains(lowerCaseQuery)) ||
                         (item.getVehicleDocId() != null && item.getVehicleDocId().toLowerCase().contains(lowerCaseQuery))) {
                     filteredList.add(item);
                 }
             }
         }
-        // Update the adapter's list
-        carAdapter.updateList(filteredList); // Add an updateList method to the adapter
+
+        // Actualiza la lista que el adapter SÍ está viendo
+        carListItems.clear();
+        carListItems.addAll(filteredList);
+        carAdapter.notifyDataSetChanged(); // Notifica al adapter del cambio
     }
 
     // --- Implementation of CarItemActionsListener ---
 
     @Override
     public void onDetailsClick(String vehicleDocId) {
+        // Asegúrate de que la vista no es nula
+        if (getView() == null) return;
         NavController navController = Navigation.findNavController(requireView());
         Bundle bundle = new Bundle();
         bundle.putString("vehicle_doc_id", vehicleDocId);
@@ -191,10 +229,17 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
                 .collection("vehicles").document(vehicleDocId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Vehículo eliminado.", Toast.LENGTH_SHORT).show();
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Vehículo eliminado.", Toast.LENGTH_SHORT).show();
+                    }
                     loadCars(); // Refresh the list
                 })
-                .addOnFailureListener(e -> { /* Handle delete error */ });
+                .addOnFailureListener(e -> {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "Error al eliminar.", Toast.LENGTH_SHORT).show();
+                    }
+                    Log.e(TAG, "Error al eliminar vehículo: ", e);
+                });
     }
 
     // --- Inner class CarListItem ---
@@ -221,22 +266,19 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
         public String getServiceStatus() { return serviceStatus; }
     }
 
-    // --- Adapter CarAdapter (UPDATED) ---
+    // --- Adapter CarAdapter (CORREGIDO) ---
     static class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
 
         private List<CarListItem> carList;
         private CarItemActionsListener listener;
 
         public CarAdapter(List<CarListItem> carList, CarItemActionsListener listener) {
-            this.carList = carList; // Use the list passed in
+            this.carList = carList; // Usa la lista que se le pasa
             this.listener = listener;
         }
 
-        // Method to update the list after filtering
-        public void updateList(List<CarListItem> newList) {
-            this.carList = newList;
-            notifyDataSetChanged();
-        }
+        // --- MÉTODO updateList() ELIMINADO ---
+        // Ya no es necesario, el filtro actualiza la lista original.
 
         @NonNull
         @Override
