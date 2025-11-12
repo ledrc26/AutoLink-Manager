@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
 
+    <!-- Vista de mapa -->
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
-        android:layout_width="match_parent" android:layout_height="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
+    <!-- Contenedor de botones -->
     <LinearLayout
         android:orientation="horizontal"
         android:padding="12dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#1E1E1ECC">
 
+        <!-- Botón Cancelar (morado por defecto, texto blanco) -->
         <Button
             android:id="@+id/btnCancel"
             android:text="Cancelar"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:textColor="@android:color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
-        <View android:layout_width="12dp" android:layout_height="0dp"/>
+        <View
+            android:layout_width="12dp"
+            android:layout_height="0dp" />
 
+        <!-- Botón Guardar (morado por defecto, texto blanco) -->
         <Button
             android:id="@+id/btnSave"
             android:text="Guardar ubicación"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:textColor="@android:color/white"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
+
 </FrameLayout>

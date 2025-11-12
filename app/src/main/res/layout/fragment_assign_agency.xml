@@ -1,44 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
     <LinearLayout
         android:orientation="vertical"
         android:padding="16dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <!-- Título usuario -->
         <TextView
             android:text="Selecciona usuario"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
+        <!-- Spinner usuarios -->
         <Spinner
             android:id="@+id/spUsers"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#BBBBBB"
+            android:popupBackground="#1E1E1E"
+            android:textColor="@android:color/white"/>
 
+        <!-- Título agencia -->
         <TextView
             android:text="Selecciona agencia"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
+        <!-- Spinner agencias -->
         <Spinner
             android:id="@+id/spAgencies"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#BBBBBB"
+            android:popupBackground="#1E1E1E"
+            android:textColor="@android:color/white"/>
 
+        <!-- Botón (morado por defecto del tema Material) -->
         <Button
             android:id="@+id/btnAssign"
             android:text="Asignar agencia al usuario"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
+        <!-- Indicador de carga -->
         <ProgressBar
             android:id="@+id/progress"
             android:visibility="gone"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:indeterminateTint="#BB86FC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
 
+        <!-- Resultado -->
         <TextView
             android:id="@+id/tvResult"
             android:text=""
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:textColor="#CCCCCC"
+            android:textSize="14sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
     </LinearLayout>
 </ScrollView>

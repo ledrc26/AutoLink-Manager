@@ -2,61 +2,75 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#121212">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Título -->
         <TextView
             android:text="AutoLink Manager"
             android:textStyle="bold"
             android:textSize="18sp"
+            android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Versión -->
         <TextView
             android:text="Versión 1.0"
+            android:textColor="#BBBBBB"
             android:layout_marginTop="4dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Línea divisora -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="#333333"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"/>
 
+        <!-- Sección de desarrolladores -->
         <TextView
             android:text="Desarrolladores"
             android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:text="• Elian Pérez\n• Eduardo De Rosas\nCarrera: ISW\nProfesora: Rocío Pulido"
+            android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <TextView
+            android:text="• Elian Pérez\n• Eduardo De Rosas\nCarrera: ISW\nProfesora: Rocío Pulido"
+            android:textColor="#CCCCCC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Línea divisora -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#DDDDDD"
+            android:background="#333333"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"/>
 
+        <!-- Sección de permisos -->
         <TextView
             android:text="Permisos utilizados"
             android:textStyle="bold"
+            android:textColor="@android:color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
         <TextView
             android:id="@+id/tvPermissions"
+            android:text="- INTERNET\n- ACCESS_NETWORK_STATE\n- ACCESS_FINE_LOCATION\n- ACCESS_COARSE_LOCATION\n- WRITE_EXTERNAL_STORAGE (solo = Android 9)"
+            android:textColor="#CCCCCC"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="- INTERNET\n- ACCESS_NETWORK_STATE\n- ACCESS_FINE_LOCATION\n- ACCESS_COARSE_LOCATION\n- WRITE_EXTERNAL_STORAGE (solo &lt;= Android 9)"/>
-
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </ScrollView>

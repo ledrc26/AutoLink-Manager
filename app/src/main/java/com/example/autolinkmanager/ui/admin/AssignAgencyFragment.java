@@ -24,7 +24,7 @@ public class AssignAgencyFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
-    // Listas en memoria para mapear selección -> ids
+    // Listas para mapear selección -> ids
     private final List<String> userIds = new ArrayList<>();
     private final List<String> userLabels = new ArrayList<>();
 
@@ -77,22 +77,33 @@ public class AssignAgencyFragment extends Fragment {
 
     private void loadUsers() {
         progress.setVisibility(View.VISIBLE);
-        // Trae todos los usuarios "agency" (puedes ajustar el filtro si deseas)
+
         db.collection("users")
                 .whereEqualTo("role", "agency")
                 .get()
                 .addOnSuccessListener(snaps -> {
-                    userIds.clear(); userLabels.clear();
+                    userIds.clear();
+                    userLabels.clear();
+
                     for (DocumentSnapshot d : snaps) {
                         String uid = d.getString("uid");
                         String nombre = d.getString("nombre");
                         String correo = d.getString("correo");
                         if (TextUtils.isEmpty(uid)) uid = d.getId();
-                        String label = (nombre != null ? nombre : "(Sin nombre)") + (correo != null ? " • " + correo : "");
+                        String label = (nombre != null ? nombre : "(Sin nombre)")
+                                + (correo != null ? " • " + correo : "");
                         userIds.add(uid);
                         userLabels.add(label);
                     }
-                    spUsers.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, userLabels));
+
+                    ArrayAdapter<String> usersAdapter = new ArrayAdapter<>(
+                            requireContext(),
+                            R.layout.spinner_item_dark,           // ítem seleccionado
+                            userLabels
+                    );
+                    usersAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_dark); // desplegable
+                    spUsers.setAdapter(usersAdapter);
+
                     progress.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
@@ -103,19 +114,31 @@ public class AssignAgencyFragment extends Fragment {
 
     private void loadAgencies() {
         progress.setVisibility(View.VISIBLE);
+
         db.collection("agencies")
                 .get()
                 .addOnSuccessListener(snaps -> {
-                    agencyIds.clear(); agencyLabels.clear();
+                    agencyIds.clear();
+                    agencyLabels.clear();
+
                     for (DocumentSnapshot d : snaps) {
                         String id = d.getId();
                         String name = d.getString("name");
                         String phone = d.getString("phone");
-                        String label = (name != null ? name : "(Sin nombre)") + (phone != null ? " • " + phone : "");
+                        String label = (name != null ? name : "(Sin nombre)")
+                                + (phone != null ? " • " + phone : "");
                         agencyIds.add(id);
                         agencyLabels.add(label);
                     }
-                    spAgencies.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, agencyLabels));
+
+                    ArrayAdapter<String> agenciesAdapter = new ArrayAdapter<>(
+                            requireContext(),
+                            R.layout.spinner_item_dark,
+                            agencyLabels
+                    );
+                    agenciesAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_dark);
+                    spAgencies.setAdapter(agenciesAdapter);
+
                     progress.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
@@ -129,9 +152,14 @@ public class AssignAgencyFragment extends Fragment {
             toast("Faltan usuarios o agencias");
             return;
         }
+
         int uPos = spUsers.getSelectedItemPosition();
         int aPos = spAgencies.getSelectedItemPosition();
-        if (uPos < 0 || aPos < 0) { toast("Selecciona usuario y agencia"); return; }
+
+        if (uPos < 0 || aPos < 0) {
+            toast("Selecciona usuario y agencia");
+            return;
+        }
 
         String uid = userIds.get(uPos);
         String agencyId = agencyIds.get(aPos);

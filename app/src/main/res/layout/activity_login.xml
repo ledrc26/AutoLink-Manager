@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:fillViewport="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#121212">
 
     <LinearLayout
         android:padding="24dp"
@@ -11,48 +12,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Título -->
         <TextView
             android:text="Iniciar sesión"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@android:color/white"
             android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Campo correo -->
         <EditText
             android:id="@+id/etEmail"
             android:hint="Correo"
             android:inputType="textEmailAddress"
+            android:textColor="@android:color/white"
+            android:textColorHint="#AAAAAA"
+            android:backgroundTint="#BBBBBB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Campo contraseña -->
         <EditText
             android:id="@+id/etPassword"
             android:hint="Contraseña"
             android:inputType="textPassword"
+            android:textColor="@android:color/white"
+            android:textColorHint="#AAAAAA"
+            android:backgroundTint="#BBBBBB"
             android:layout_marginTop="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Botón -->
         <Button
             android:id="@+id/btnLogin"
             android:text="Entrar"
             android:layout_marginTop="16dp"
+            android:textColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Enlace de registro -->
         <TextView
             android:id="@+id/tvGoRegister"
             android:text="¿No tienes cuenta? Regístrate"
-            android:textColor="@android:color/holo_blue_dark"
+            android:textColor="#90CAF9"
             android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Barra de carga -->
         <ProgressBar
             android:id="@+id/progress"
             android:visibility="gone"
             android:layout_marginTop="16dp"
+            android:indeterminateTint="#90CAF9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

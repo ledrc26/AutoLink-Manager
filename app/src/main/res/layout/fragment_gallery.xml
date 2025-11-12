@@ -28,7 +28,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="24dp" />
 
-            <!-- FILA 1 - MÉTRICAS (2 tarjetas lado a lado) -->
+            <!-- FILA 1 - MÉTRICAS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,7 +44,10 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardUseCompatPadding="true"
-                    app:cardCornerRadius="16dp">
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:strokeColor="#2A2A2A"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -78,7 +81,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     app:cardUseCompatPadding="true"
-                    app:cardCornerRadius="16dp">
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:strokeColor="#2A2A2A"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -106,14 +112,17 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- FILA 2 - Total pendiente (MXN) en tarjeta completa -->
+            <!-- FILA 2 - Total pendiente -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_pagos_pendientes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardUseCompatPadding="true"
-                app:cardCornerRadius="16dp">
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#1E1E1E"
+                app:strokeColor="#2A2A2A"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -148,7 +157,7 @@
                 android:weightSum="2"
                 android:layout_marginBottom="16dp">
 
-                <!-- Botón Crear Agencia -->
+                <!-- Crear agencia -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_crear_agencia"
                     android:layout_width="0dp"
@@ -156,7 +165,10 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardUseCompatPadding="true"
-                    app:cardCornerRadius="16dp">
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:strokeColor="#2A2A2A"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -169,6 +181,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/outline_add_24"
+                            android:tint="#BB86FC"
                             android:contentDescription="Crear" />
 
                         <TextView
@@ -181,14 +194,17 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Botón Mapa de Agencias -->
+                <!-- Mapa de agencias -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_mapa_agencias"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     app:cardUseCompatPadding="true"
-                    app:cardCornerRadius="16dp">
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#1E1E1E"
+                    app:strokeColor="#2A2A2A"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -201,6 +217,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/outline_list_alt_24"
+                            android:tint="#BB86FC"
                             android:contentDescription="Mapa" />
 
                         <TextView

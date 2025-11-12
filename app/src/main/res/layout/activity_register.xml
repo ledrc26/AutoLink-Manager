@@ -2,7 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:fillViewport="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#121212">
 
     <LinearLayout
         android:padding="24dp"
@@ -11,49 +12,68 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Título -->
         <TextView
             android:text="Crear cuenta"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@android:color/white"
             android:layout_marginBottom="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
+        <!-- Campo nombre -->
         <EditText
             android:id="@+id/etNombre"
             android:hint="Nombre"
             android:inputType="textPersonName"
+            android:textColor="@android:color/white"
+            android:textColorHint="#AAAAAA"
+            android:backgroundTint="#BBBBBB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Campo correo -->
         <EditText
             android:id="@+id/etEmail"
             android:hint="Correo"
             android:inputType="textEmailAddress"
+            android:textColor="@android:color/white"
+            android:textColorHint="#AAAAAA"
+            android:backgroundTint="#BBBBBB"
             android:layout_marginTop="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Campo contraseña -->
         <EditText
             android:id="@+id/etPassword"
             android:hint="Contraseña (mín. 6)"
             android:inputType="textPassword"
+            android:textColor="@android:color/white"
+            android:textColorHint="#AAAAAA"
+            android:backgroundTint="#BBBBBB"
             android:layout_marginTop="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Botón morado (color por defecto del tema Material) -->
         <Button
             android:id="@+id/btnRegister"
             android:text="Registrar"
             android:layout_marginTop="16dp"
+            android:textColor="@android:color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <!-- Barra de carga -->
         <ProgressBar
             android:id="@+id/progress"
             android:visibility="gone"
             android:layout_marginTop="16dp"
+            android:indeterminateTint="#BB86FC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </ScrollView>

@@ -1,25 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="16dp"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#121212">
 
+    <!-- Campo nombre -->
     <EditText
         android:id="@+id/etName"
         android:hint="Nombre de la agencia"
-        android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        android:textColor="@android:color/white"
+        android:textColorHint="#AAAAAA"
+        android:backgroundTint="#BBBBBB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
+    <!-- Campo teléfono -->
     <EditText
         android:id="@+id/etPhone"
         android:hint="Teléfono"
         android:inputType="phone"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:textColor="@android:color/white"
+        android:textColorHint="#AAAAAA"
+        android:backgroundTint="#BBBBBB"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
+    <!-- Botón morado (por defecto del tema Material) -->
     <Button
         android:id="@+id/btnChangeLocation"
         android:text="Cambiar ubicación en mapa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="12dp"
+        android:textColor="@android:color/white" />
 
 </LinearLayout>
