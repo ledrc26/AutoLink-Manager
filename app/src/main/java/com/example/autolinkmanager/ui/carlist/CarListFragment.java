@@ -278,7 +278,7 @@ public class CarListFragment extends Fragment implements CarItemActionsListener 
         }
 
         // --- MÉTODO updateList() ELIMINADO ---
-        // Ya no es necesario, el filtro actualiza la lista original.
+        // Ya no es necesario, el filtro actualiza la lista original.5
 
         @NonNull
         @Override

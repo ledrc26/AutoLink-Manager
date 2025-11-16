@@ -163,7 +163,7 @@ public class RegisterActivity extends AppCompatActivity {
                     userDoc.put("role", "pending");
                     userDoc.put("requestedAgencyId", selected.id);
                     userDoc.put("agencyId", null);
-                    userDoc.put("isActive", 0);
+                    userDoc.put("isActive", false);
 
                     db.collection("users").document(uid).set(userDoc)
                             .addOnSuccessListener(unused -> {

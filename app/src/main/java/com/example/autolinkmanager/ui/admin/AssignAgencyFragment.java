@@ -91,7 +91,7 @@ public class AssignAgencyFragment extends Fragment {
         tvNoRequests.setVisibility(View.GONE);
 
         db.collection("users")
-                .whereEqualTo("isActive", 0)
+                .whereEqualTo("isActive", false)
                 .get()
                 .addOnSuccessListener(snaps -> {
                     requests.clear();
@@ -160,24 +160,22 @@ public class AssignAgencyFragment extends Fragment {
     private void acceptRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
 
-        // Actualizar usuario: isActive=1, role=agency, agencyId
+        // 1. Actualizar usuario: isActive=true, role=agency, agencyId
         Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("isActive", 1);
+        userUpdates.put("isActive", true); // Tu cambio a Booleano
         userUpdates.put("role", "agency");
         userUpdates.put("agencyId", request.agencyId);
 
         db.collection("users").document(request.userId)
                 .update(userUpdates)
                 .addOnSuccessListener(unused -> {
-                    // Actualizar agencia: userID con el uid del usuario
+                    // 2. Actualizar agencia: userID con el uid del usuario
                     db.collection("agencies").document(request.agencyId)
                             .update("userID", request.userId)
                             .addOnSuccessListener(unused2 -> {
-                                progress.setVisibility(View.GONE);
-                                toast("✅ Solicitud aceptada: " + request.userName);
-
-                                // Recargar lista
-                                loadPendingRequests();
+                                // 3. ¡NUEVO! Rechazar y eliminar a otros usuarios
+                                //    que solicitaron la MISMA agencia.
+                                findAndRejectOthers(request.agencyId, request.userId, request.userName);
                             })
                             .addOnFailureListener(e -> {
                                 progress.setVisibility(View.GONE);
@@ -190,22 +188,84 @@ public class AssignAgencyFragment extends Fragment {
                 });
     }
 
+    private void findAndRejectOthers(String agencyId, String acceptedUserId, String acceptedUserName) {
+
+        // Buscamos usuarios:
+        // 1. Pendientes (isActive == false)
+        // 2. Que pidieron la misma agencia (requestedAgencyId == agencyId)
+        db.collection("users")
+                .whereEqualTo("isActive", false) // Asumiendo 'false' es el estado pendiente
+                .whereEqualTo("requestedAgencyId", agencyId)
+                .get()
+                .addOnSuccessListener(snaps -> {
+
+                    if (snaps.isEmpty()) {
+                        // No había otros usuarios que rechazar, terminamos.
+                        progress.setVisibility(View.GONE);
+                        toast("✅ Solicitud aceptada: " + acceptedUserName);
+                        loadPendingRequests(); // Recargar lista
+                        return;
+                    }
+
+                    // Usamos un WriteBatch para eliminar a todos los
+                    // usuarios pendientes en una sola operación atómica.
+                    WriteBatch batch = db.batch();
+                    int rejectedCount = 0;
+
+                    for (DocumentSnapshot doc : snaps) {
+                        // Nos aseguramos de NO borrar al usuario que
+                        // acabamos de aceptar (aunque no debería salir
+                        // en esta query, es una buena precaución).
+                        if (!doc.getId().equals(acceptedUserId)) {
+                            batch.delete(doc.getReference());
+                            rejectedCount++;
+                        }
+                    }
+
+                    // Ejecutar la eliminación en lote
+                    int finalRejectedCount = rejectedCount;
+                    batch.commit()
+                            .addOnSuccessListener(unused -> {
+                                progress.setVisibility(View.GONE);
+                                // Mensaje final
+                                String toastMsg = "✅ Solicitud aceptada: " + acceptedUserName;
+                                if (finalRejectedCount > 0) {
+                                    toastMsg += ". " + finalRejectedCount + " otra(s) solicitud(es) fueron eliminadas.";
+                                }
+                                toast(toastMsg);
+                                loadPendingRequests(); // Recargar lista
+                            })
+                            .addOnFailureListener(e -> {
+                                progress.setVisibility(View.GONE);
+                                toast("Error al eliminar otros usuarios: " + e.getMessage());
+                                loadPendingRequests(); // Recargar de todos modos
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progress.setVisibility(View.GONE);
+                    toast("Error buscando otros pendientes: " + e.getMessage());
+                    loadPendingRequests(); // Recargar de todos modos
+                });
+    }
+
     private void rejectRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
 
-        // Actualizar usuario: isActive=2
+        // Eliminar el documento del usuario en lugar de actualizarlo
         db.collection("users").document(request.userId)
-                .update("isActive", 2)
+                .delete() // <--- CAMBIO AQUÍ
                 .addOnSuccessListener(unused -> {
                     progress.setVisibility(View.GONE);
-                    toast("❌ Solicitud rechazada: " + request.userName);
+                    // Mensaje actualizado para reflejar la eliminación
+                    toast("❌ Usuario rechazado y eliminado: " + request.userName);
 
                     // Recargar lista
                     loadPendingRequests();
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
-                    toast("Error al rechazar: " + e.getMessage());
+                    // Mensaje de error actualizado
+                    toast("Error al eliminar: " + e.getMessage());
                 });
     }
 

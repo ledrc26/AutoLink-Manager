@@ -41,7 +41,7 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String currentAgencyId;
-
+    private TextView tv_agency_name_title;
     // UI Views
     private TextView tvVehiculosRegistradosValue, tvServiciosEnCursoValue, tvPagosPendientesValue;
     private MaterialCardView cardAltaVehiculo, cardVerServicios, cardCobros;
@@ -87,7 +87,7 @@ public class HomeFragment extends Fragment {
         // Inicializar RecyclerView y Adapter
         recyclerViewMovimientos = view.findViewById(R.id.recycler_view_movimientos); // Necesitas añadir ID al LinearLayout contenedor
         tvNoMovements = view.findViewById(R.id.tv_no_movements);             // Añade un TextView para este mensaje en tu layout
-
+        tv_agency_name_title = view.findViewById(R.id.tv_agency_name_title);
         recyclerViewMovimientos.setLayoutManager(new LinearLayoutManager(getContext()));
         movementsAdapter = new RecentMovementsAdapter(movementItems);
         recyclerViewMovimientos.setAdapter(movementsAdapter);
@@ -158,9 +158,14 @@ public class HomeFragment extends Fragment {
                                 if (user != null && user.getAgencyId() != null) {
                                     currentAgencyId = user.getAgencyId();
                                     Log.d(TAG, "Agency ID: " + currentAgencyId);
-                                    // Carga las estadísticas y movimientos AHORA que tienes el ID
+
+                                    // Carga las estadísticas y movimientos
                                     loadDashboardStats();
                                     loadRecentMovements();
+
+                                    // ¡AQUÍ ESTÁ EL CAMBIO!
+                                    loadAgencyName(currentAgencyId);
+
                                 } else { /* Manejar usuario sin agencyId */ }
                             } else { /* Manejar documento de usuario no encontrado */ }
                         } else { /* Manejar error al cargar usuario */ }
@@ -314,5 +319,27 @@ public class HomeFragment extends Fragment {
                 tvStatus = itemView.findViewById(R.id.tv_movement_status);
             }
         }
+    }
+    private void loadAgencyName(String agencyId) {
+        if (agencyId == null || tv_agency_name_title == null) return;
+
+        db.collection("agencies").document(agencyId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String agencyName = documentSnapshot.getString("name");
+                        if (agencyName != null && !agencyName.isEmpty()) {
+                            tv_agency_name_title.setText(agencyName);
+                        } else {
+                            tv_agency_name_title.setText("Agencia sin nombre");
+                        }
+                    } else {
+                        Log.w(TAG, "No se encontró el documento de la agencia: " + agencyId);
+                        tv_agency_name_title.setText("Agencia no encontrada");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al cargar nombre de agencia", e);
+                    tv_agency_name_title.setText("Error");
+                });
     }
 }
