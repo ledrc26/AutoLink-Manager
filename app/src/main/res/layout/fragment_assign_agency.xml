@@ -1,77 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212">
+    android:background="#121212"
+    android:padding="16dp">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
+    <!-- Título -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:text="Solicitudes Pendientes"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <!-- ListView de solicitudes -->
+    <ListView
+        android:id="@+id/lvRequests"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_below="@id/tvTitle"
+        android:divider="#2E2E2E"
+        android:dividerHeight="1dp" />
 
-        <!-- Título usuario -->
-        <TextView
-            android:text="Selecciona usuario"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    <!-- Mensaje cuando no hay solicitudes -->
+    <TextView
+        android:id="@+id/tvNoRequests"
+        android:text="No hay solicitudes pendientes"
+        android:textColor="#888888"
+        android:textSize="16sp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-        <!-- Spinner usuarios -->
-        <Spinner
-            android:id="@+id/spUsers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:backgroundTint="#BBBBBB"
-            android:popupBackground="#1E1E1E"
-            android:textColor="@android:color/white"/>
+    <!-- Indicador de carga -->
+    <ProgressBar
+        android:id="@+id/progress"
+        android:visibility="gone"
+        android:indeterminateTint="#BB86FC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
-        <!-- Título agencia -->
-        <TextView
-            android:text="Selecciona agencia"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <!-- Spinner agencias -->
-        <Spinner
-            android:id="@+id/spAgencies"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#BBBBBB"
-            android:popupBackground="#1E1E1E"
-            android:textColor="@android:color/white"/>
-
-        <!-- Botón (morado por defecto del tema Material) -->
-        <Button
-            android:id="@+id/btnAssign"
-            android:text="Asignar agencia al usuario"
-            android:textColor="@android:color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- Indicador de carga -->
-        <ProgressBar
-            android:id="@+id/progress"
-            android:visibility="gone"
-            android:indeterminateTint="#BB86FC"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
-
-        <!-- Resultado -->
-        <TextView
-            android:id="@+id/tvResult"
-            android:text=""
-            android:textColor="#CCCCCC"
-            android:textSize="14sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
-
-    </LinearLayout>
-</ScrollView>
+</RelativeLayout>

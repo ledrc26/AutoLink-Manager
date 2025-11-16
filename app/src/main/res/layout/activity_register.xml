@@ -57,7 +57,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!-- Botón morado (color por defecto del tema Material) -->
+        <!-- Selector de agencia disponible -->
+        <TextView
+            android:id="@+id/tvAgencyHint"
+            android:text="Selecciona la agencia a la que solicitas acceso"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:id="@+id/spAgency"
+            android:spinnerMode="dropdown"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <!-- Botón Registrar -->
         <Button
             android:id="@+id/btnRegister"
             android:text="Registrar"
@@ -73,6 +89,16 @@
             android:layout_marginTop="16dp"
             android:indeterminateTint="#BB86FC"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <!-- Mensaje cuando no hay agencias libres -->
+        <TextView
+            android:id="@+id/tvNoAgencies"
+            android:text="No hay agencias disponibles por ahora."
+            android:textColor="#AAAAAA"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>

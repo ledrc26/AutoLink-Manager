@@ -16,40 +16,51 @@ import java.util.*;
 
 public class AssignAgencyFragment extends Fragment {
 
-    private Spinner spUsers, spAgencies;
-    private Button btnAssign;
+    private ListView lvRequests;
     private ProgressBar progress;
-    private TextView tvResult;
+    private TextView tvNoRequests;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
-    // Listas para mapear selección -> ids
-    private final List<String> userIds = new ArrayList<>();
-    private final List<String> userLabels = new ArrayList<>();
+    // Lista de solicitudes
+    private final List<RequestItem> requests = new ArrayList<>();
+    private RequestAdapter adapter;
 
-    private final List<String> agencyIds = new ArrayList<>();
-    private final List<String> agencyLabels = new ArrayList<>();
+    // Clase interna para manejar las solicitudes
+    public static class RequestItem {
+        public String userId;
+        public String userName;
+        public String userEmail;
+        public String agencyId;
+        public String agencyName;
+
+        public RequestItem(String userId, String userName, String userEmail, String agencyId, String agencyName) {
+            this.userId = userId;
+            this.userName = userName;
+            this.userEmail = userEmail;
+            this.agencyId = agencyId;
+            this.agencyName = agencyName;
+        }
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_assign_agency, container, false);
 
-        spUsers = v.findViewById(R.id.spUsers);
-        spAgencies = v.findViewById(R.id.spAgencies);
-        btnAssign = v.findViewById(R.id.btnAssign);
+        lvRequests = v.findViewById(R.id.lvRequests);
         progress = v.findViewById(R.id.progress);
-        tvResult = v.findViewById(R.id.tvResult);
+        tvNoRequests = v.findViewById(R.id.tvNoRequests);
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
         enforceAdminOrPop();
 
-        loadUsers();
-        loadAgencies();
+        adapter = new RequestAdapter();
+        lvRequests.setAdapter(adapter);
 
-        btnAssign.setOnClickListener(view -> assignAgency());
+        loadPendingRequests();
 
         return v;
     }
@@ -75,116 +86,174 @@ public class AssignAgencyFragment extends Fragment {
                 });
     }
 
-    private void loadUsers() {
+    private void loadPendingRequests() {
         progress.setVisibility(View.VISIBLE);
+        tvNoRequests.setVisibility(View.GONE);
 
         db.collection("users")
-                .whereEqualTo("role", "agency")
+                .whereEqualTo("isActive", 0)
                 .get()
                 .addOnSuccessListener(snaps -> {
-                    userIds.clear();
-                    userLabels.clear();
+                    requests.clear();
 
+                    if (snaps.isEmpty()) {
+                        progress.setVisibility(View.GONE);
+                        tvNoRequests.setVisibility(View.VISIBLE);
+                        adapter.notifyDataSetChanged();
+                        return;
+                    }
+
+                    // Cargar datos de cada usuario y su agencia solicitada
                     for (DocumentSnapshot d : snaps) {
                         String uid = d.getString("uid");
-                        String nombre = d.getString("nombre");
-                        String correo = d.getString("correo");
                         if (TextUtils.isEmpty(uid)) uid = d.getId();
-                        String label = (nombre != null ? nombre : "(Sin nombre)")
-                                + (correo != null ? " • " + correo : "");
-                        userIds.add(uid);
-                        userLabels.add(label);
+
+                        String nombre = d.getString("nombre");
+                        String email = d.getString("email");
+                        String requestedAgencyId = d.getString("requestedAgencyId");
+
+                        if (!TextUtils.isEmpty(requestedAgencyId)) {
+                            // Obtener nombre de la agencia
+                            String finalUid = uid;
+                            String finalNombre = nombre != null ? nombre : "(Sin nombre)";
+                            String finalEmail = email != null ? email : "";
+
+                            db.collection("agencies").document(requestedAgencyId)
+                                    .get()
+                                    .addOnSuccessListener(agencyDoc -> {
+                                        String agencyName = agencyDoc.getString("name");
+                                        if (agencyName == null) agencyName = "(Agencia sin nombre)";
+
+                                        requests.add(new RequestItem(
+                                                finalUid,
+                                                finalNombre,
+                                                finalEmail,
+                                                requestedAgencyId,
+                                                agencyName
+                                        ));
+
+                                        adapter.notifyDataSetChanged();
+                                        progress.setVisibility(View.GONE);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Agregar aunque no se encuentre la agencia
+                                        requests.add(new RequestItem(
+                                                finalUid,
+                                                finalNombre,
+                                                finalEmail,
+                                                requestedAgencyId,
+                                                "(Agencia no encontrada)"
+                                        ));
+
+                                        adapter.notifyDataSetChanged();
+                                        progress.setVisibility(View.GONE);
+                                    });
+                        }
                     }
-
-                    ArrayAdapter<String> usersAdapter = new ArrayAdapter<>(
-                            requireContext(),
-                            R.layout.spinner_item_dark,           // ítem seleccionado
-                            userLabels
-                    );
-                    usersAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_dark); // desplegable
-                    spUsers.setAdapter(usersAdapter);
-
-                    progress.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
-                    toast("Error cargando usuarios: " + e.getMessage());
+                    toast("Error cargando solicitudes: " + e.getMessage());
                 });
     }
 
-    private void loadAgencies() {
+    private void acceptRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
 
-        db.collection("agencies")
-                .get()
-                .addOnSuccessListener(snaps -> {
-                    agencyIds.clear();
-                    agencyLabels.clear();
+        // Actualizar usuario: isActive=1, role=agency, agencyId
+        Map<String, Object> userUpdates = new HashMap<>();
+        userUpdates.put("isActive", 1);
+        userUpdates.put("role", "agency");
+        userUpdates.put("agencyId", request.agencyId);
 
-                    for (DocumentSnapshot d : snaps) {
-                        String id = d.getId();
-                        String name = d.getString("name");
-                        String phone = d.getString("phone");
-                        String label = (name != null ? name : "(Sin nombre)")
-                                + (phone != null ? " • " + phone : "");
-                        agencyIds.add(id);
-                        agencyLabels.add(label);
-                    }
+        db.collection("users").document(request.userId)
+                .update(userUpdates)
+                .addOnSuccessListener(unused -> {
+                    // Actualizar agencia: userID con el uid del usuario
+                    db.collection("agencies").document(request.agencyId)
+                            .update("userID", request.userId)
+                            .addOnSuccessListener(unused2 -> {
+                                progress.setVisibility(View.GONE);
+                                toast("✅ Solicitud aceptada: " + request.userName);
 
-                    ArrayAdapter<String> agenciesAdapter = new ArrayAdapter<>(
-                            requireContext(),
-                            R.layout.spinner_item_dark,
-                            agencyLabels
-                    );
-                    agenciesAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item_dark);
-                    spAgencies.setAdapter(agenciesAdapter);
-
-                    progress.setVisibility(View.GONE);
+                                // Recargar lista
+                                loadPendingRequests();
+                            })
+                            .addOnFailureListener(e -> {
+                                progress.setVisibility(View.GONE);
+                                toast("Error al actualizar agencia: " + e.getMessage());
+                            });
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
-                    toast("Error cargando agencias: " + e.getMessage());
+                    toast("Error al aceptar: " + e.getMessage());
                 });
     }
 
-    private void assignAgency() {
-        if (userIds.isEmpty() || agencyIds.isEmpty()) {
-            toast("Faltan usuarios o agencias");
-            return;
-        }
-
-        int uPos = spUsers.getSelectedItemPosition();
-        int aPos = spAgencies.getSelectedItemPosition();
-
-        if (uPos < 0 || aPos < 0) {
-            toast("Selecciona usuario y agencia");
-            return;
-        }
-
-        String uid = userIds.get(uPos);
-        String agencyId = agencyIds.get(aPos);
-
+    private void rejectRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
-        btnAssign.setEnabled(false);
 
-        db.collection("users").document(uid)
-                .update("agencyId", agencyId)
+        // Actualizar usuario: isActive=2
+        db.collection("users").document(request.userId)
+                .update("isActive", 2)
                 .addOnSuccessListener(unused -> {
                     progress.setVisibility(View.GONE);
-                    btnAssign.setEnabled(true);
-                    String userLabel = userLabels.get(uPos);
-                    String agencyLabel = agencyLabels.get(aPos);
-                    tvResult.setText("Asignado: " + userLabel + " \n→ " + agencyLabel);
-                    toast("Agencia asignada");
+                    toast("❌ Solicitud rechazada: " + request.userName);
+
+                    // Recargar lista
+                    loadPendingRequests();
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
-                    btnAssign.setEnabled(true);
-                    toast("Error al asignar: " + e.getMessage());
+                    toast("Error al rechazar: " + e.getMessage());
                 });
     }
 
     private void toast(String s) {
         Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
+    }
+
+    // Adapter personalizado para mostrar las solicitudes
+    private class RequestAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return requests.size();
+        }
+
+        @Override
+        public RequestItem getItem(int position) {
+            return requests.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.item_request, parent, false);
+            }
+
+            RequestItem item = getItem(position);
+
+            TextView tvUserName = convertView.findViewById(R.id.tvUserName);
+            TextView tvUserEmail = convertView.findViewById(R.id.tvUserEmail);
+            TextView tvAgencyName = convertView.findViewById(R.id.tvAgencyName);
+            Button btnAccept = convertView.findViewById(R.id.btnAccept);
+            Button btnReject = convertView.findViewById(R.id.btnReject);
+
+            tvUserName.setText(item.userName);
+            tvUserEmail.setText(item.userEmail);
+            tvAgencyName.setText("Solicita: " + item.agencyName);
+
+            btnAccept.setOnClickListener(v -> acceptRequest(item));
+            btnReject.setOnClickListener(v -> rejectRequest(item));
+
+            return convertView;
+        }
     }
 }

@@ -103,6 +103,7 @@ public class CreateAgencyFragment extends Fragment {
         doc.put("location", new GeoPoint(lat, lng));
         doc.put("createdBy", user.getUid());
         doc.put("createdAt", FieldValue.serverTimestamp());
+        doc.put("userID", null);
 
         db.collection("agencies").add(doc)
                 .addOnSuccessListener(ref -> {
