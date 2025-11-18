@@ -5,7 +5,6 @@
     android:background="#121212"
     android:padding="16dp">
 
-    <!-- Título -->
     <TextView
         android:id="@+id/tvTitle"
         android:text="Solicitudes Pendientes"
@@ -16,16 +15,31 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
 
-    <!-- ListView de solicitudes -->
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvTitle"
+        android:hint="Buscar por nombre o correo..."
+        android:textColor="@android:color/white"
+        android:textColorHint="#888888"
+        android:background="#2E2E2E"
+        android:padding="10dp"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:drawableTint="#BB86FC"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="10dp"
+        android:inputType="text"
+        android:maxLines="1" />
+
     <ListView
         android:id="@+id/lvRequests"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tvTitle"
+        android:layout_below="@id/etSearch"
         android:divider="#2E2E2E"
         android:dividerHeight="1dp" />
 
-    <!-- Mensaje cuando no hay solicitudes -->
     <TextView
         android:id="@+id/tvNoRequests"
         android:text="No hay solicitudes pendientes"
@@ -36,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <!-- Indicador de carga -->
     <ProgressBar
         android:id="@+id/progress"
         android:visibility="gone"

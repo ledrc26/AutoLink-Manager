@@ -1,7 +1,9 @@
 package com.example.autolinkmanager.ui.admin;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -19,15 +21,18 @@ public class AssignAgencyFragment extends Fragment {
     private ListView lvRequests;
     private ProgressBar progress;
     private TextView tvNoRequests;
+    private EditText etSearch; // 1. Declarar el buscador
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
-    // Lista de solicitudes
-    private final List<RequestItem> requests = new ArrayList<>();
+    // Lista "Maestra" (contiene todos los datos originales)
+    private final List<RequestItem> allRequests = new ArrayList<>();
+    // Lista "Visible" (contiene solo lo filtrado para el Adapter)
+    private final List<RequestItem> displayedRequests = new ArrayList<>();
+
     private RequestAdapter adapter;
 
-    // Clase interna para manejar las solicitudes
     public static class RequestItem {
         public String userId;
         public String userName;
@@ -51,6 +56,7 @@ public class AssignAgencyFragment extends Fragment {
         lvRequests = v.findViewById(R.id.lvRequests);
         progress = v.findViewById(R.id.progress);
         tvNoRequests = v.findViewById(R.id.tvNoRequests);
+        etSearch = v.findViewById(R.id.etSearch); // 2. Vincular vista
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
@@ -60,9 +66,60 @@ public class AssignAgencyFragment extends Fragment {
         adapter = new RequestAdapter();
         lvRequests.setAdapter(adapter);
 
+        // 3. Configurar el listener del buscador
+        setupSearchFilter();
+
         loadPendingRequests();
 
         return v;
+    }
+
+    // Lógica del buscador
+    private void setupSearchFilter() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterList(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    // Método para filtrar
+    private void filterList(String text) {
+        displayedRequests.clear();
+
+        if (TextUtils.isEmpty(text)) {
+            // Si no hay texto, mostramos todo
+            displayedRequests.addAll(allRequests);
+        } else {
+            String query = text.toLowerCase();
+            for (RequestItem item : allRequests) {
+                // Buscar por nombre O por email
+                if (item.userName.toLowerCase().contains(query) ||
+                        item.userEmail.toLowerCase().contains(query)) {
+                    displayedRequests.add(item);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+
+        // Controlar visibilidad del mensaje "No hay solicitudes" si el filtro no retorna nada
+        if (displayedRequests.isEmpty() && !allRequests.isEmpty()) {
+            // Opcional: Podrías poner un texto diferente como "No hay resultados para la búsqueda"
+            // Pero por ahora usaremos el mismo TextView o lo ocultamos
+            tvNoRequests.setVisibility(View.GONE);
+        } else if (displayedRequests.isEmpty() && allRequests.isEmpty()) {
+            tvNoRequests.setVisibility(View.VISIBLE);
+        } else {
+            tvNoRequests.setVisibility(View.GONE);
+        }
     }
 
     private void enforceAdminOrPop() {
@@ -90,20 +147,27 @@ public class AssignAgencyFragment extends Fragment {
         progress.setVisibility(View.VISIBLE);
         tvNoRequests.setVisibility(View.GONE);
 
+        // Limpiamos ambas listas antes de cargar
+        allRequests.clear();
+        displayedRequests.clear();
+        adapter.notifyDataSetChanged();
+
         db.collection("users")
                 .whereEqualTo("isActive", false)
                 .get()
                 .addOnSuccessListener(snaps -> {
-                    requests.clear();
 
                     if (snaps.isEmpty()) {
                         progress.setVisibility(View.GONE);
                         tvNoRequests.setVisibility(View.VISIBLE);
-                        adapter.notifyDataSetChanged();
-                        return;
+                        return; // Salimos si no hay nada
                     }
 
-                    // Cargar datos de cada usuario y su agencia solicitada
+                    // Variable atómica para contar procesos asíncronos completados
+                    // (Necesario porque buscamos el nombre de agencia uno por uno)
+                    final int totalDocs = snaps.size();
+                    final int[] loadedDocs = {0};
+
                     for (DocumentSnapshot d : snaps) {
                         String uid = d.getString("uid");
                         if (TextUtils.isEmpty(uid)) uid = d.getId();
@@ -112,42 +176,27 @@ public class AssignAgencyFragment extends Fragment {
                         String email = d.getString("email");
                         String requestedAgencyId = d.getString("requestedAgencyId");
 
-                        if (!TextUtils.isEmpty(requestedAgencyId)) {
-                            // Obtener nombre de la agencia
-                            String finalUid = uid;
-                            String finalNombre = nombre != null ? nombre : "(Sin nombre)";
-                            String finalEmail = email != null ? email : "";
+                        String finalUid = uid;
+                        String finalNombre = nombre != null ? nombre : "(Sin nombre)";
+                        String finalEmail = email != null ? email : "";
 
+                        if (!TextUtils.isEmpty(requestedAgencyId)) {
                             db.collection("agencies").document(requestedAgencyId)
                                     .get()
                                     .addOnSuccessListener(agencyDoc -> {
                                         String agencyName = agencyDoc.getString("name");
                                         if (agencyName == null) agencyName = "(Agencia sin nombre)";
 
-                                        requests.add(new RequestItem(
-                                                finalUid,
-                                                finalNombre,
-                                                finalEmail,
-                                                requestedAgencyId,
-                                                agencyName
-                                        ));
-
-                                        adapter.notifyDataSetChanged();
-                                        progress.setVisibility(View.GONE);
+                                        addRequestToList(new RequestItem(finalUid, finalNombre, finalEmail, requestedAgencyId, agencyName));
+                                        checkIfFinished(++loadedDocs[0], totalDocs);
                                     })
                                     .addOnFailureListener(e -> {
-                                        // Agregar aunque no se encuentre la agencia
-                                        requests.add(new RequestItem(
-                                                finalUid,
-                                                finalNombre,
-                                                finalEmail,
-                                                requestedAgencyId,
-                                                "(Agencia no encontrada)"
-                                        ));
-
-                                        adapter.notifyDataSetChanged();
-                                        progress.setVisibility(View.GONE);
+                                        addRequestToList(new RequestItem(finalUid, finalNombre, finalEmail, requestedAgencyId, "(Agencia no encontrada)"));
+                                        checkIfFinished(++loadedDocs[0], totalDocs);
                                     });
+                        } else {
+                            // Si no tiene agencia solicitada, contamos como procesado pero quizás no lo agregamos o lo agregamos con N/A
+                            checkIfFinished(++loadedDocs[0], totalDocs);
                         }
                     }
                 })
@@ -157,24 +206,46 @@ public class AssignAgencyFragment extends Fragment {
                 });
     }
 
+    // Método auxiliar para agregar a las listas
+    private void addRequestToList(RequestItem item) {
+        allRequests.add(item);
+        // Aplicar filtro actual si el usuario ya escribió algo mientras cargaba
+        String currentSearch = etSearch.getText().toString();
+        if (TextUtils.isEmpty(currentSearch)) {
+            displayedRequests.add(item);
+        } else {
+            if (item.userName.toLowerCase().contains(currentSearch.toLowerCase()) ||
+                    item.userEmail.toLowerCase().contains(currentSearch.toLowerCase())) {
+                displayedRequests.add(item);
+            }
+        }
+    }
+
+    // Método auxiliar para checar si terminaron las cargas asíncronas
+    private void checkIfFinished(int current, int total) {
+        if (current >= total) {
+            progress.setVisibility(View.GONE);
+            adapter.notifyDataSetChanged();
+            if (displayedRequests.isEmpty() && allRequests.isEmpty()) {
+                tvNoRequests.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     private void acceptRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
 
-        // 1. Actualizar usuario: isActive=true, role=agency, agencyId
         Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("isActive", true); // Tu cambio a Booleano
+        userUpdates.put("isActive", true);
         userUpdates.put("role", "agency");
         userUpdates.put("agencyId", request.agencyId);
 
         db.collection("users").document(request.userId)
                 .update(userUpdates)
                 .addOnSuccessListener(unused -> {
-                    // 2. Actualizar agencia: userID con el uid del usuario
                     db.collection("agencies").document(request.agencyId)
                             .update("userID", request.userId)
                             .addOnSuccessListener(unused2 -> {
-                                // 3. ¡NUEVO! Rechazar y eliminar a otros usuarios
-                                //    que solicitaron la MISMA agencia.
                                 findAndRejectOthers(request.agencyId, request.userId, request.userName);
                             })
                             .addOnFailureListener(e -> {
@@ -189,82 +260,63 @@ public class AssignAgencyFragment extends Fragment {
     }
 
     private void findAndRejectOthers(String agencyId, String acceptedUserId, String acceptedUserName) {
-
-        // Buscamos usuarios:
-        // 1. Pendientes (isActive == false)
-        // 2. Que pidieron la misma agencia (requestedAgencyId == agencyId)
         db.collection("users")
-                .whereEqualTo("isActive", false) // Asumiendo 'false' es el estado pendiente
+                .whereEqualTo("isActive", false)
                 .whereEqualTo("requestedAgencyId", agencyId)
                 .get()
                 .addOnSuccessListener(snaps -> {
-
                     if (snaps.isEmpty()) {
-                        // No había otros usuarios que rechazar, terminamos.
                         progress.setVisibility(View.GONE);
                         toast("✅ Solicitud aceptada: " + acceptedUserName);
-                        loadPendingRequests(); // Recargar lista
+                        loadPendingRequests();
                         return;
                     }
 
-                    // Usamos un WriteBatch para eliminar a todos los
-                    // usuarios pendientes en una sola operación atómica.
                     WriteBatch batch = db.batch();
                     int rejectedCount = 0;
 
                     for (DocumentSnapshot doc : snaps) {
-                        // Nos aseguramos de NO borrar al usuario que
-                        // acabamos de aceptar (aunque no debería salir
-                        // en esta query, es una buena precaución).
                         if (!doc.getId().equals(acceptedUserId)) {
                             batch.delete(doc.getReference());
                             rejectedCount++;
                         }
                     }
 
-                    // Ejecutar la eliminación en lote
                     int finalRejectedCount = rejectedCount;
                     batch.commit()
                             .addOnSuccessListener(unused -> {
                                 progress.setVisibility(View.GONE);
-                                // Mensaje final
                                 String toastMsg = "✅ Solicitud aceptada: " + acceptedUserName;
                                 if (finalRejectedCount > 0) {
                                     toastMsg += ". " + finalRejectedCount + " otra(s) solicitud(es) fueron eliminadas.";
                                 }
                                 toast(toastMsg);
-                                loadPendingRequests(); // Recargar lista
+                                loadPendingRequests();
                             })
                             .addOnFailureListener(e -> {
                                 progress.setVisibility(View.GONE);
                                 toast("Error al eliminar otros usuarios: " + e.getMessage());
-                                loadPendingRequests(); // Recargar de todos modos
+                                loadPendingRequests();
                             });
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
                     toast("Error buscando otros pendientes: " + e.getMessage());
-                    loadPendingRequests(); // Recargar de todos modos
+                    loadPendingRequests();
                 });
     }
 
     private void rejectRequest(RequestItem request) {
         progress.setVisibility(View.VISIBLE);
-
-        // Eliminar el documento del usuario en lugar de actualizarlo
         db.collection("users").document(request.userId)
-                .delete() // <--- CAMBIO AQUÍ
+                .delete()
                 .addOnSuccessListener(unused -> {
                     progress.setVisibility(View.GONE);
-                    // Mensaje actualizado para reflejar la eliminación
                     toast("❌ Usuario rechazado y eliminado: " + request.userName);
-
-                    // Recargar lista
                     loadPendingRequests();
                 })
                 .addOnFailureListener(e -> {
                     progress.setVisibility(View.GONE);
-                    // Mensaje de error actualizado
                     toast("Error al eliminar: " + e.getMessage());
                 });
     }
@@ -273,17 +325,17 @@ public class AssignAgencyFragment extends Fragment {
         Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
     }
 
-    // Adapter personalizado para mostrar las solicitudes
     private class RequestAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
-            return requests.size();
+            // 4. El adaptador ahora usa displayedRequests
+            return displayedRequests.size();
         }
 
         @Override
         public RequestItem getItem(int position) {
-            return requests.get(position);
+            return displayedRequests.get(position);
         }
 
         @Override
