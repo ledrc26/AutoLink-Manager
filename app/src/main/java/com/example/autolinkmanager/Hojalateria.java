@@ -11,6 +11,8 @@ public class Hojalateria extends Auto{
     private double costo;
     private boolean pagado; // true for "Pagado", false for "No pagado"
     private String notas;
+    private boolean isFinished;      // Nuevo campo estado
+    private String fotoTerminadoBase64;
 
     // --- Constructor ---
 
@@ -74,5 +76,20 @@ public class Hojalateria extends Auto{
 
     public void setNotas(String notas) {
         this.notas = notas;
+    }
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
+    public String getFotoTerminadoBase64() {
+        return fotoTerminadoBase64;
+    }
+
+    public void setFotoTerminadoBase64(String fotoTerminadoBase64) {
+        this.fotoTerminadoBase64 = fotoTerminadoBase64;
     }
 }
