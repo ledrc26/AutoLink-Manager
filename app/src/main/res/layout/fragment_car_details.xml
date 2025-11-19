@@ -294,6 +294,28 @@
                     tools:text="Pagado"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estatus Servicio: "
+                    android:textColor="#AAAAAA"
+                    android:textSize="16sp"/>
+                <TextView
+                    android:id="@+id/tv_detail_is_finished"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="En Proceso"/>
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tv_detail_notas_label"
                 android:layout_width="wrap_content"
@@ -308,7 +330,28 @@
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                tools:text="Se realizó cambio de aceite, filtros y bujías. El carro estaba muy sucio por dentro."/>
+                android:layout_marginBottom="16dp"
+                tools:text="Notas del servicio..."/>
+
+            <TextView
+                android:id="@+id/tv_finished_photo_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Evidencia de Finalización:"
+                android:textColor="#AAAAAA"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <ImageView
+                android:id="@+id/iv_finished_photo"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:background="#333333"
+                android:visibility="gone"
+                tools:visibility="visible"/>
 
         </LinearLayout>
 

@@ -2,6 +2,7 @@ package com.example.autolinkmanager.ui.mantenimiento;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 
@@ -27,6 +28,7 @@ import com.example.autolinkmanager.Auto;
 import com.example.autolinkmanager.Mantenimiento;
 import com.example.autolinkmanager.R;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -208,20 +210,35 @@ public class MantenimientoFragment extends Fragment {
         // ------------------------------------------------------------------
         Toast.makeText(getContext(), "Verificando disponibilidad...", Toast.LENGTH_SHORT).show();
 
+// 1. Limpiamos la placa para evitar errores de espacios o minúsculas
+        String placaConsulta = auto.getPlaca().trim();
+
         db.collection("agencies").document(agencyId)
                 .collection("vehicles")
-                .whereEqualTo("placa", auto.getPlaca())
-                .whereEqualTo("isFinished", false)
+                .whereEqualTo("placa", placaConsulta) // Usamos la placa limpia
+                .whereEqualTo("isFinished", false)    // Ahora coincidirá gracias al @PropertyName
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
-                        Toast.makeText(getContext(), "El auto ya tiene un servicio activo. Debe finalizarse antes de ingresar uno nuevo.", Toast.LENGTH_LONG).show();
+                        // SI ENTRA AQUÍ, SIGNIFICA QUE YA HAY UN SERVICIO ABIERTO
+                        // Obtenemos el documento para ver qué tipo de servicio es (opcional)
+                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
+                        String tipoExistente = doc.contains("tipoMantenimiento") ? "Mantenimiento" : "Hojalatería";
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        builder.setTitle("⚠️ Vehículo Ocupado");
+                        builder.setMessage("El auto con placas " + placaConsulta + " ya tiene un servicio de " + tipoExistente + " en curso y no ha sido finalizado.\n\nDebes terminar el servicio anterior para registrar uno nuevo.");
+                        builder.setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss());
+                        builder.show();
+
                     } else {
+                        // NO HAY SERVICIO ACTIVO -> PROCEDEMOS A GUARDAR
                         guardarRegistro(tipoMantenimiento, fechaIngreso, fechaSalida, costo, isPagado, notas);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error al verificar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error al verificar base de datos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error query: ", e);
                 });
     }
 
