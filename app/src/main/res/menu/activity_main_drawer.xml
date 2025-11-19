@@ -48,6 +48,11 @@
             android:id="@+id/nav_calendar"
             android:icon="@drawable/outline_list_alt_24"
             android:title="Calendario" />
+
+        <item
+            android:id="@+id/nav_filter_vehicles"
+            android:icon="@drawable/reporte"
+            android:title="Filtrar vehículos" />
     </group>
 
     <item
