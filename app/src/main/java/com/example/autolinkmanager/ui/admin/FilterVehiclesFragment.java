@@ -104,37 +104,61 @@ public class FilterVehiclesFragment extends Fragment {
             @Override
             public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 View rowView = getLayoutInflater().inflate(R.layout.item_vehicle_row, parent, false);
+
                 TextView tvTitle    = rowView.findViewById(R.id.tvTitle);
                 TextView tvSubtitle = rowView.findViewById(R.id.tvSubtitle);
+                TextView tvStatus   = rowView.findViewById(R.id.tvStatus);
 
                 Map<String, Object> m = rows.get(position);
 
                 String placa  = value(m.get("placa"));
                 String modelo = value(m.get("modelo"));
+
                 Double costo  = m.get("costo") instanceof Number
                         ? ((Number) m.get("costo")).doubleValue()
                         : null;
-                Boolean pagado = (Boolean) m.get("pagado");
-                Timestamp t    = (Timestamp) m.get("fechaIngreso");
 
+                Boolean pagado    = (Boolean) m.get("pagado");
+                Boolean terminado = (Boolean) m.get("isFinished");
+                Timestamp t       = (Timestamp) m.get("fechaIngreso");
+
+                // Título: Placa — Modelo
                 tvTitle.setText(
                         (placa.isEmpty() ? "—" : placa) +
                                 " — " +
                                 (modelo.isEmpty() ? "—" : modelo)
                 );
 
-                String ing = (t != null) ? sdfFull.format(t.toDate()) : "—";
+                // Ingreso solo con FECHA (ya sin hora)
+                String ing = (t != null) ? sdfDay.format(t.toDate()) : "—";
+
+                // Costo
                 String cos = (costo != null)
                         ? String.format(Locale.getDefault(), "$%.2f", costo)
                         : "—";
+
+                // Pagado
                 String pay = (pagado != null && pagado) ? "Sí" : "No";
 
-                tvSubtitle.setText("Ingreso: " + ing +
-                        "  •  Costo: " + cos +
-                        "  •  Pagado: " + pay);
+                // Subtítulo: Ingreso + Costo + Pagado
+                tvSubtitle.setText(
+                        "Ingreso: " + ing +
+                                "  •  Costo: " + cos +
+                                "  •  Pagado: " + pay
+                );
+
+                // Estado Terminado/Pendiente con COLOR
+                if (terminado != null && terminado) {
+                    tvStatus.setText("Terminado");
+                    tvStatus.setTextColor(0xFF4CAF50); // Verde
+                } else {
+                    tvStatus.setText("En proceso");
+                    tvStatus.setTextColor(0xFFF44336); // Rojo
+                }
 
                 return rowView;
             }
+
         };
         lvVehicles.setAdapter(listAdapter);
 

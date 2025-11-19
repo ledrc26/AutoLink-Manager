@@ -31,5 +31,5 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Conecta agencias, controla servicios, impulsa tu taller" />
+        android:text="Controla servicios" />
 </LinearLayout>

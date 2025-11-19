@@ -8,17 +8,27 @@
 
     <TextView
         android:id="@+id/tvTitle"
-        android:text="Placa — Modelo"
-        android:textStyle="bold"
         android:textColor="@android:color/white"
+        android:textStyle="bold"
         android:textSize="16sp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <!-- Subtítulo: ingreso + costo + pagado -->
     <TextView
         android:id="@+id/tvSubtitle"
-        android:text="Ingreso: —  •  Costo: —  •  Pagado: —"
         android:textColor="#CCCCCC"
+        android:textSize="14sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- Estado Terminado / Pendiente con color -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:text="Estado"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </LinearLayout>

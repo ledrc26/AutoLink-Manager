@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView.getMenu().findItem(R.id.nav_add_car).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_car_list).setVisible(false);
         navigationView.getMenu().findItem(R.id.nav_calendar).setVisible(false);
+        navigationView.getMenu().findItem(R.id.nav_filter_vehicles).setVisible(false);
 
         showAdminItemsIfNeeded();
 
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     binding.navView.getMenu().findItem(R.id.nav_agencies_map).setVisible(adminVisible);
                     binding.navView.getMenu().findItem(R.id.nav_assign_agency).setVisible(adminVisible);
                     binding.navView.getMenu().findItem(R.id.nav_manage_agencies).setVisible(adminVisible);
+                    binding.navView.getMenu().findItem(R.id.nav_filter_vehicles).setVisible(adminVisible);
 
                     boolean userVisible = !isAdmin;
                     binding.navView.getMenu().findItem(R.id.nav_home).setVisible(userVisible);
