@@ -2,6 +2,7 @@ package com.example.autolinkmanager.ui.mantenimiento;
 
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 
@@ -27,6 +28,7 @@ import com.example.autolinkmanager.Auto;
 import com.example.autolinkmanager.Mantenimiento;
 import com.example.autolinkmanager.R;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -135,7 +137,7 @@ public class MantenimientoFragment extends Fragment {
             return;
         }
 
-        // 1. OBTENER DATOS DE MANTENIMIENTO
+        // 1. OBTENER DATOS
         String tipoMantenimiento = tilTipoMantenimiento.getSelectedItem().toString();
         String fechaIngresoStr = tvFechaIngreso.getText().toString().trim();
         String fechaSalidaStr = tilFechaSalida.getText().toString().trim();
@@ -148,43 +150,100 @@ public class MantenimientoFragment extends Fragment {
         tvTipoError.setVisibility(View.GONE);
         tvFechaError.setVisibility(View.GONE);
         tilCosto.setError(null);
+        tilFechaSalida.setError(null); // Limpiar error previo
 
         if (tipoMantenimiento.isEmpty()) {
             tvTipoError.setVisibility(View.VISIBLE);
             esValido = false;
         }
 
-        // La validación de "dd/mm/aaaa" ya no es necesaria, solo la de vacío
+        // Validar Fecha Ingreso
         if (fechaIngresoStr.isEmpty()) {
             tvFechaError.setVisibility(View.VISIBLE);
             esValido = false;
         }
+
+        // --- CAMBIO: Validar Fecha Salida OBLIGATORIA ---
+        if (fechaSalidaStr.isEmpty() || fechaSalidaStr.equals("dd/mm/aaaa")) {
+            tilFechaSalida.setError("La fecha de salida es obligatoria");
+            esValido = false;
+        }
+
         if (!esValido) return;
 
-        Date fechaIngreso = null;
-        Date fechaSalida = null;
+        Date fechaIngresoTemp = null;
+        Date fechaSalidaTemp = null;
         try {
-            fechaIngreso = dateFormatter.parse(fechaIngresoStr);
-            if (!fechaSalidaStr.isEmpty() && !fechaSalidaStr.equals("dd/mm/aaaa")) {
-                fechaSalida = dateFormatter.parse(fechaSalidaStr);
+            fechaIngresoTemp = dateFormatter.parse(fechaIngresoStr);
+            // Como ya validamos que no sea vacía, parseamos directamente
+            fechaSalidaTemp = dateFormatter.parse(fechaSalidaStr);
+
+            // Opcional: Validar que la fecha de salida no sea anterior a la de ingreso
+            if (fechaSalidaTemp.before(fechaIngresoTemp)) {
+                tilFechaSalida.setError("La salida no puede ser antes del ingreso");
+                return;
             }
+
         } catch (ParseException e) {
             tvFechaError.setText("Formato de fecha incorrecto");
             tvFechaError.setVisibility(View.VISIBLE);
             return;
         }
 
-        double costo = 0.0;
+        double costoTemp = 0.0;
         if (!costoStr.isEmpty()) {
             try {
-                costo = Double.parseDouble(costoStr);
+                costoTemp = Double.parseDouble(costoStr);
             } catch (NumberFormatException e) {
                 tilCosto.setError("Costo inválido");
                 return;
             }
         }
 
-        // 2. CREAR EL OBJETO 'Mantenimiento' COMPLETO
+        // Variables finales para usar en la lambda
+        final Date fechaIngreso = fechaIngresoTemp;
+        final Date fechaSalida = fechaSalidaTemp;
+        final double costo = costoTemp;
+
+        // ------------------------------------------------------------------
+        // VERIFICAR SI EL AUTO YA TIENE UN SERVICIO ACTIVO
+        // ------------------------------------------------------------------
+        Toast.makeText(getContext(), "Verificando disponibilidad...", Toast.LENGTH_SHORT).show();
+
+// 1. Limpiamos la placa para evitar errores de espacios o minúsculas
+        String placaConsulta = auto.getPlaca().trim();
+
+        db.collection("agencies").document(agencyId)
+                .collection("vehicles")
+                .whereEqualTo("placa", placaConsulta) // Usamos la placa limpia
+                .whereEqualTo("isFinished", false)    // Ahora coincidirá gracias al @PropertyName
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        // SI ENTRA AQUÍ, SIGNIFICA QUE YA HAY UN SERVICIO ABIERTO
+                        // Obtenemos el documento para ver qué tipo de servicio es (opcional)
+                        DocumentSnapshot doc = queryDocumentSnapshots.getDocuments().get(0);
+                        String tipoExistente = doc.contains("tipoMantenimiento") ? "Mantenimiento" : "Hojalatería";
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        builder.setTitle("⚠️ Vehículo Ocupado");
+                        builder.setMessage("El auto con placas " + placaConsulta + " ya tiene un servicio de " + tipoExistente + " en curso y no ha sido finalizado.\n\nDebes terminar el servicio anterior para registrar uno nuevo.");
+                        builder.setPositiveButton("Entendido", (dialog, which) -> dialog.dismiss());
+                        builder.show();
+
+                    } else {
+                        // NO HAY SERVICIO ACTIVO -> PROCEDEMOS A GUARDAR
+                        guardarRegistro(tipoMantenimiento, fechaIngreso, fechaSalida, costo, isPagado, notas);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error al verificar base de datos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error query: ", e);
+                });
+    }
+
+    // (El método guardarRegistro se mantiene igual que en la respuesta anterior)
+    private void guardarRegistro(String tipo, Date fIngreso, Date fSalida, double costo, boolean pagado, String notas) {
         Mantenimiento mantenimiento = new Mantenimiento();
 
         // --- Copiar datos del Auto ---
@@ -194,32 +253,32 @@ public class MantenimientoFragment extends Fragment {
         mantenimiento.setNombrePropietario(auto.getNombrePropietario());
         mantenimiento.setTelefonoPropietario(auto.getTelefonoPropietario());
         mantenimiento.setFotoBase64(auto.getFotoBase64());
-        mantenimiento.setAgencyId(auto.getAgencyId()); // Guarda el ID de la agencia
+        mantenimiento.setAgencyId(auto.getAgencyId());
 
         // --- Añadir datos del Mantenimiento ---
-        mantenimiento.setTipoMantenimiento(tipoMantenimiento);
-        mantenimiento.setFechaIngreso(fechaIngreso);
-        mantenimiento.setFechaSalida(fechaSalida);
+        mantenimiento.setTipoMantenimiento(tipo);
+        mantenimiento.setFechaIngreso(fIngreso);
+        mantenimiento.setFechaSalida(fSalida);
         mantenimiento.setCosto(costo);
-        mantenimiento.setPagado(isPagado);
+        mantenimiento.setPagado(pagado);
         mantenimiento.setNotas(notas);
 
-        // 3. GUARDAR EL OBJETO COMPLETO EN FIREBASE
-        Toast.makeText(getContext(), "Guardando...", Toast.LENGTH_SHORT).show();
+        // --- NUEVOS CAMPOS REQUERIDOS ---
+        mantenimiento.setFinished(false); // Por defecto FALSE (servicio activo)
+        mantenimiento.setFotoTerminadoBase64(null); // Por defecto NULL
 
-        // Asegúrate de que R.id.nav_home es el ID correcto
+        // Guardar
         db.collection("agencies").document(agencyId)
                 .collection("vehicles")
                 .add(mantenimiento)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "¡Vehículo y Servicio guardados!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "¡Servicio de Mantenimiento registrado!", Toast.LENGTH_SHORT).show();
                     if (getView() != null) {
                         Navigation.findNavController(requireView()).popBackStack(R.id.nav_home, false);
                     }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Error al guardar en Firebase", e);
                 });
     }
 }

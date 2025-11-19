@@ -18,6 +18,7 @@ import androidx.navigation.Navigation;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -66,10 +67,15 @@ public class CarDetailsFragment extends Fragment {
     private View viewDetailColorPreview;
     private TextView tvDetailColorHex, tvDetailTiposTrabajo;
 
+    // NUEVAS UI Views
+    private TextView tvDetailIsFinished, tvFinishedPhotoLabel;
+    private ImageView ivFinishedPhoto;
+
     // State variables for payment status logic
     private boolean originalPaymentStatus = false; // Status when the screen loaded
     private boolean currentPaymentStatus = false; // Status as the user clicks (can change)
     private boolean paymentStatusChanged = false; // Flag to track if changes were made
+    private boolean isServiceFinished = false; // Flag to check if service is finished
 
     public CarDetailsFragment() {
         // Required empty public constructor
@@ -84,18 +90,31 @@ public class CarDetailsFragment extends Fragment {
         dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("es", "MX")); // MXN currency format
 
+        // Habilitar el menú para poder interceptar la flecha de retroceso del AppBar
+        setHasOptionsMenu(true);
+
         // Get the vehicle document ID passed from the previous fragment
         if (getArguments() != null) {
             vehicleDocId = getArguments().getString("vehicle_doc_id");
         }
 
-        // Intercept the back button press to check for unsaved changes
+        // Intercept the physical back button press to check for unsaved changes
         requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 confirmExit(); // Call the method to handle exit confirmation
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Interceptar la flecha de atrás de la AppBar (android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
+            confirmExit(); // Usar la misma lógica de confirmación
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
@@ -129,6 +148,11 @@ public class CarDetailsFragment extends Fragment {
         viewDetailColorPreview = view.findViewById(R.id.view_detail_color_preview);
         tvDetailColorHex = view.findViewById(R.id.tv_detail_color_hex);
         tvDetailTiposTrabajo = view.findViewById(R.id.tv_detail_tipos_trabajo);
+
+        // NUEVOS FindViewById
+        tvDetailIsFinished = view.findViewById(R.id.tv_detail_is_finished);
+        tvFinishedPhotoLabel = view.findViewById(R.id.tv_finished_photo_label);
+        ivFinishedPhoto = view.findViewById(R.id.iv_finished_photo);
 
         // --- Set the click listener for the payment status TextView ---
         tvDetailEstadoPago.setOnClickListener(v -> togglePaymentStatus());
@@ -196,6 +220,11 @@ public class CarDetailsFragment extends Fragment {
                             String telefonoPropietario = document.getString("telefonoPropietario");
                             String fotoBase64 = document.getString("fotoBase64");
 
+                            // NUEVO: Leer datos de finalización
+                            Boolean isFinishedObj = document.getBoolean("isFinished");
+                            boolean isFinished = (isFinishedObj != null) && isFinishedObj;
+                            String fotoTerminadoBase64 = document.getString("fotoTerminadoBase64");
+
                             // Display common Auto info
                             tvDetailPlaca.setText(placa != null ? placa : "N/A");
                             tvDetailModelo.setText(modelo != null ? modelo : "N/A");
@@ -221,10 +250,10 @@ public class CarDetailsFragment extends Fragment {
 
                             if (tipoMantenimiento != null && !tipoMantenimiento.isEmpty()) {
                                 Mantenimiento mantenimiento = document.toObject(Mantenimiento.class);
-                                if (mantenimiento != null) displayServiceDetails(mantenimiento); else handleDeserializationError("Mantenimiento");
+                                if (mantenimiento != null) displayServiceDetails(mantenimiento, isFinished, fotoTerminadoBase64); else handleDeserializationError("Mantenimiento");
                             } else if (isHojalateria) {
                                 Hojalateria hojalateria = document.toObject(Hojalateria.class);
-                                if (hojalateria != null) displayServiceDetails(hojalateria); else handleDeserializationError("Hojalateria");
+                                if (hojalateria != null) displayServiceDetails(hojalateria, isFinished, fotoTerminadoBase64); else handleDeserializationError("Hojalateria");
                             } else {
                                 // No specific service data found
                                 layoutServiceDetails.setVisibility(View.GONE);
@@ -260,10 +289,13 @@ public class CarDetailsFragment extends Fragment {
     }
 
     // Displays the service details in the UI based on the object type (Mantenimiento or Hojalateria)
-    private void displayServiceDetails(Auto serviceObject) {
+    // MODIFICADO: Ahora recibe isFinished y fotoTerminadoBase64
+    private void displayServiceDetails(Auto serviceObject, boolean isFinished, String fotoTerminadoBase64) {
         layoutServiceDetails.setVisibility(View.VISIBLE);
         tvNoServiceInfo.setVisibility(View.GONE);
         layoutHojalateriaDetails.setVisibility(View.GONE); // Hide Hojalateria details by default
+
+        this.isServiceFinished = isFinished; // Guardar en variable global si es necesario
 
         // Common service variables
         Date fechaIngreso = null;
@@ -328,6 +360,46 @@ public class CarDetailsFragment extends Fragment {
         paymentStatusChanged = false; // Reset change flag on load
         updatePaymentStatusUI(currentPaymentStatus); // Update the TextView
 
+        // NUEVO: Si el servicio está terminado, bloqueamos el cambio de estado de pago
+        if (isFinished) {
+            tvDetailEstadoPago.setOnClickListener(null); // Quitar listener
+            tvDetailEstadoPago.setClickable(false);
+            // Opcional: Cambiar la apariencia para indicar que no es editable (ej. quitar foreground ripple)
+            tvDetailEstadoPago.setForeground(null);
+        } else {
+            // Asegurarnos que tiene el listener si no está terminado
+            tvDetailEstadoPago.setOnClickListener(v -> togglePaymentStatus());
+        }
+
+        // --- NUEVA LÓGICA: MOSTRAR ESTATUS Y FOTO ---
+        if (isFinished) {
+            tvDetailIsFinished.setText("Terminado");
+            tvDetailIsFinished.setTextColor(Color.GREEN); // Verde para terminado
+
+            // Foto de finalización
+            if (fotoTerminadoBase64 != null && !fotoTerminadoBase64.isEmpty()) {
+                Bitmap finishedBitmap = base64ToBitmap(fotoTerminadoBase64);
+                if (finishedBitmap != null) {
+                    ivFinishedPhoto.setImageBitmap(finishedBitmap);
+                    ivFinishedPhoto.setVisibility(View.VISIBLE);
+                    tvFinishedPhotoLabel.setVisibility(View.VISIBLE);
+                } else {
+                    // Error decodificando
+                    ivFinishedPhoto.setVisibility(View.GONE);
+                    tvFinishedPhotoLabel.setVisibility(View.GONE);
+                }
+            } else {
+                // No hay foto
+                ivFinishedPhoto.setVisibility(View.GONE);
+                tvFinishedPhotoLabel.setVisibility(View.GONE);
+            }
+        } else {
+            tvDetailIsFinished.setText("En Proceso");
+            tvDetailIsFinished.setTextColor(Color.YELLOW); // Amarillo/Naranja para proceso
+            ivFinishedPhoto.setVisibility(View.GONE);
+            tvFinishedPhotoLabel.setVisibility(View.GONE);
+        }
+
         // Display common service details in the UI
         tvDetailServiceType.setText(serviceTypeName);
         tvDetailFechaIngreso.setText(fechaIngreso != null ? dateFormatter.format(fechaIngreso) : "N/A");
@@ -357,6 +429,8 @@ public class CarDetailsFragment extends Fragment {
     // Toggles the payment status when the TextView is clicked
     private void togglePaymentStatus() {
         if (!layoutServiceDetails.isShown()) return; // Do nothing if service details aren't visible
+        // Extra check: If finished, do not toggle (although listener is removed, safety check)
+        if (isServiceFinished) return;
 
         currentPaymentStatus = !currentPaymentStatus; // Flip the current state
         // Mark as changed only if the current state differs from the originally loaded state
