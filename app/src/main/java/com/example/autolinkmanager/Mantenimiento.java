@@ -19,7 +19,8 @@ public class Mantenimiento extends Auto { // Ya es Serializable por herencia
 
     public String getTipoMantenimiento() { return tipoMantenimiento; }
     public void setTipoMantenimiento(String tipoMantenimiento) { this.tipoMantenimiento = tipoMantenimiento; }
-
+    private boolean isFinished;      // Nuevo campo estado
+    private String fotoTerminadoBase64;
     public Date getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(Date fechaIngreso) { this.fechaIngreso = fechaIngreso; }
 
@@ -34,4 +35,21 @@ public class Mantenimiento extends Auto { // Ya es Serializable por herencia
 
     public String getNotas() { return notas; }
     public void setNotas(String notas) { this.notas = notas; }
+
+    public boolean isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(boolean finished) {
+        isFinished = finished;
+    }
+
+    public String getFotoTerminadoBase64() {
+        return fotoTerminadoBase64;
+    }
+
+    public void setFotoTerminadoBase64(String fotoTerminadoBase64) {
+        this.fotoTerminadoBase64 = fotoTerminadoBase64;
+    }
+
 }
