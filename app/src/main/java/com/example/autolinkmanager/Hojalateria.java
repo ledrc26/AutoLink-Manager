@@ -1,5 +1,7 @@
 package com.example.autolinkmanager;
 
+import com.google.firebase.firestore.PropertyName;
+
 import java.util.Date;
 import java.util.List;
 
@@ -77,10 +79,11 @@ public class Hojalateria extends Auto{
     public void setNotas(String notas) {
         this.notas = notas;
     }
+    @PropertyName("isFinished")
     public boolean isFinished() {
         return isFinished;
     }
-
+    @PropertyName("isFinished")
     public void setFinished(boolean finished) {
         isFinished = finished;
     }

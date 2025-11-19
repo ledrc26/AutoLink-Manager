@@ -1,5 +1,7 @@
 package com.example.autolinkmanager;
 
+import com.google.firebase.firestore.PropertyName;
+
 import java.util.Date; // Necesitarás importar la clase Date
 
 public class Mantenimiento extends Auto { // Ya es Serializable por herencia
@@ -35,11 +37,11 @@ public class Mantenimiento extends Auto { // Ya es Serializable por herencia
 
     public String getNotas() { return notas; }
     public void setNotas(String notas) { this.notas = notas; }
-
+    @PropertyName("isFinished")
     public boolean isFinished() {
         return isFinished;
     }
-
+    @PropertyName("isFinished")
     public void setFinished(boolean finished) {
         isFinished = finished;
     }

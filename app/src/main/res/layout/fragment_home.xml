@@ -6,122 +6,163 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#121212"
-    tools:context=".ui.home.HomeFragment"> <androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+    tools:context=".ui.home.HomeFragment">
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/tv_agency_name_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dashboard (Agencia)"
-            android:textColor="@android:color/white"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_marginBottom="12dp">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_vehiculos"
-                style="@style/StatCard">
-                <LinearLayout style="@style/StatCardContent">
-                    <TextView
-                        android:id="@+id/tv_vehiculos_registrados_value"
-                        style="@style/StatCardValue"
-                        tools:text="0" />
-                    <TextView style="@style/StatCardTitle" android:text="Vehículos registrados" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tv_agency_name_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="24dp"/>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_servicios" style="@style/StatCard">
-                <LinearLayout style="@style/StatCardContent">
-                    <TextView
-                        android:id="@+id/tv_servicios_en_curso_value"
-                        style="@style/StatCardValue"
-                        tools:text="0" />
-                    <TextView style="@style/StatCardTitle" android:text="Servicios en curso" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="12dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_pagos" style="@style/StatCard">
-                <LinearLayout style="@style/StatCardContent">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_vehiculos"
+                    style="@style/StatCard"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1">
+                    <LinearLayout style="@style/StatCardContent">
+                        <TextView
+                            android:id="@+id/tv_vehiculos_registrados_value"
+                            style="@style/StatCardValue"
+                            tools:text="0" />
+                        <TextView style="@style/StatCardTitle" android:text="Vehículos registrados" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_servicios"
+                    style="@style/StatCard"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1">
+                    <LinearLayout style="@style/StatCardContent">
+                        <TextView
+                            android:id="@+id/tv_servicios_en_curso_value"
+                            style="@style/StatCardValue"
+                            android:textColor="#FFB300"
+                            tools:text="0" />
+                        <TextView style="@style/StatCardTitle" android:text="Servicios en curso" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_pagos"
+                    style="@style/StatCard"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1">
+                    <LinearLayout style="@style/StatCardContent">
+                        <TextView
+                            android:id="@+id/tv_pagos_pendientes_value"
+                            style="@style/StatCardValue"
+                            android:textColor="#E53935"
+                            tools:text="0" />
+                        <TextView style="@style/StatCardTitle" android:text="Pagos pendientes" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_ganancias"
+                    style="@style/StatCard"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    app:cardBackgroundColor="#1B5E20"> <LinearLayout style="@style/StatCardContent">
                     <TextView
-                        android:id="@+id/tv_pagos_pendientes_value"
+                        android:id="@+id/tv_ganancias_totales_value"
                         style="@style/StatCardValue"
-                        tools:text="0" />
-                    <TextView style="@style/StatCardTitle" android:text="Pagos pendientes" />
+                        android:textColor="#69F0AE"
+                        android:textSize="22sp"
+                        tools:text="$0.00" />
+                    <TextView style="@style/StatCardTitle" android:text="Ganancias Totales" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_alta_vehiculo"
+                    style="@style/ActionCard"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1">
+                    <LinearLayout style="@style/ActionCardContent">
+                        <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_add_24" android:contentDescription="Alta"/>
+                        <TextView style="@style/ActionCardText" android:text="Alta vehículo" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_ver_servicios"
+                    style="@style/ActionCard"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1">
+                    <LinearLayout style="@style/ActionCardContent">
+                        <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_list_alt_24" android:contentDescription="Ver"/>
+                        <TextView style="@style/ActionCardText" android:text="Ver servicios" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Últimos movimientos"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_movimientos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_recent_movement"
+                tools:itemCount="3"/>
+
+            <TextView
+                android:id="@+id/tv_no_movements"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No hay movimientos recientes."
+                android:textColor="#AAAAAA"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_alta_vehiculo"
-                style="@style/ActionCard">
-                <LinearLayout style="@style/ActionCardContent">
-                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_add_24" android:contentDescription="Alta"/>
-                    <TextView style="@style/ActionCardText" android:text="Alta vehículo" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_ver_servicios"
-                style="@style/ActionCard">
-                <LinearLayout style="@style/ActionCardContent">
-                    <ImageView style="@style/ActionCardIcon" android:src="@drawable/outline_list_alt_24" android:contentDescription="Ver"/>
-                    <TextView style="@style/ActionCardText" android:text="Ver servicios" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Últimos movimientos"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_movimientos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_recent_movement"
-            tools:itemCount="3"/>
-
-        <TextView
-            android:id="@+id/tv_no_movements"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No hay movimientos recientes."
-            android:textColor="#AAAAAA"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:padding="32dp"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
