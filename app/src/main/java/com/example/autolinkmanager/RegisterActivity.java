@@ -18,7 +18,6 @@ import com.google.firebase.firestore.*;
 
 import java.util.*;
 
-// Activity de Registro con PRE-REGISTRO y selector de agencia
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
@@ -32,11 +31,9 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    // Lista y adapter para el Spinner
     private ArrayAdapter<AgencyOption> agencyAdapter;
     private final List<AgencyOption> agenciesFree = new ArrayList<>();
 
-    // Clase simple para el Spinner
     public static class AgencyOption {
         public final String id;
         public final String label;
@@ -51,18 +48,17 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        etNombre = findViewById(R.id.etNombre);
-        etEmail  = findViewById(R.id.etEmail);
+        etNombre   = findViewById(R.id.etNombre);
+        etEmail    = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnRegister = findViewById(R.id.btnRegister);
-        progress = findViewById(R.id.progress);
-        spAgency = findViewById(R.id.spAgency);
+        progress    = findViewById(R.id.progress);
+        spAgency    = findViewById(R.id.spAgency);
         tvNoAgencies = findViewById(R.id.tvNoAgencies);
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        db    = FirebaseFirestore.getInstance();
 
-        // (Opcional) Log para diagnosticar la configuración de Firebase en runtime
         try {
             FirebaseOptions opts = FirebaseApp.getInstance().getOptions();
             Log.d(TAG, "FirebaseOptions:");
@@ -74,11 +70,9 @@ public class RegisterActivity extends AppCompatActivity {
             Log.e(TAG, "No se pudieron obtener FirebaseOptions", e);
         }
 
-        // Configurar Spinner
         agencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, agenciesFree);
         spAgency.setAdapter(agencyAdapter);
 
-        // Cargar agencias con userID == null
         loadAvailableAgencies();
 
         btnRegister.setOnClickListener(v -> doRegister());
@@ -87,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void loadAvailableAgencies() {
         progress.setVisibility(View.VISIBLE);
         db.collection("agencies")
-                .whereEqualTo("userID", null) // IMPORTANTE: el campo DEBE existir y ser null
+                .whereEqualTo("userID", null)
                 .get()
                 .addOnCompleteListener(this::onAgenciesLoaded);
     }
@@ -105,7 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (snap != null) {
             for (DocumentSnapshot d : snap) {
-                String id = d.getId();
+                String id   = d.getId();
                 String name = d.getString("name");
                 agenciesFree.add(new AgencyOption(id, name != null ? name : "(Sin nombre)"));
             }
@@ -119,11 +113,11 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void doRegister() {
         String nombre = etNombre.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String pass = etPassword.getText().toString().trim();
+        String email  = etEmail.getText().toString().trim();
+        String pass   = etPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(nombre)) { etNombre.setError("Requerido"); return; }
-        if (TextUtils.isEmpty(email)) { etEmail.setError("Requerido"); return; }
+        if (TextUtils.isEmpty(email))  { etEmail.setError("Requerido");  return; }
         if (TextUtils.isEmpty(pass) || pass.length() < 6) {
             etPassword.setError("Mínimo 6 caracteres"); return;
         }
@@ -136,7 +130,37 @@ public class RegisterActivity extends AppCompatActivity {
         progress.setVisibility(View.VISIBLE);
         btnRegister.setEnabled(false);
 
-        // Crear usuario en Auth
+        db.collection("agencies")
+                .document(selected.id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Object currentUserId = doc.get("userID");
+                    if (currentUserId != null) {
+                        progress.setVisibility(View.GONE);
+                        btnRegister.setEnabled(true);
+                        Toast.makeText(
+                                this,
+                                "Esta agencia ya fue asignada mientras te registrabas. " +
+                                        "Selecciona otra agencia disponible.",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        loadAvailableAgencies();
+                        return;
+                    }
+
+                    createAuthAndProfile(selected, nombre, email, pass);
+                })
+                .addOnFailureListener(e -> {
+                    progress.setVisibility(View.GONE);
+                    btnRegister.setEnabled(true);
+                    Log.e(TAG, "Error verificando agencia antes de registrar", e);
+                    Toast.makeText(this, "No se pudo verificar la agencia. Intenta de nuevo.", Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void createAuthAndProfile(AgencyOption selected, String nombre, String email, String pass) {
+
         mAuth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, authTask -> {
                     if (!authTask.isSuccessful()) {
@@ -155,7 +179,6 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                     String uid = fUser.getUid();
 
-                    // Crear perfil de usuario
                     Map<String, Object> userDoc = new HashMap<>();
                     userDoc.put("uid", uid);
                     userDoc.put("email", email);
@@ -164,34 +187,42 @@ public class RegisterActivity extends AppCompatActivity {
                     userDoc.put("requestedAgencyId", selected.id);
                     userDoc.put("agencyId", null);
                     userDoc.put("isActive", false);
+                    userDoc.put("createdAt", FieldValue.serverTimestamp());
 
                     db.collection("users").document(uid).set(userDoc)
                             .addOnSuccessListener(unused -> {
-                                // Crear solicitud para auditoría
                                 Map<String, Object> req = new HashMap<>();
                                 req.put("userId", uid);
                                 req.put("agencyId", selected.id);
+                                req.put("status", "pending");
+                                req.put("createdAt", FieldValue.serverTimestamp());
 
                                 db.collection("agency_requests").add(req)
                                         .addOnSuccessListener(r -> {
-                                            // 🔥 CERRAR SESIÓN Y REDIRIGIR AL LOGIN
                                             mAuth.signOut();
                                             progress.setVisibility(View.GONE);
                                             btnRegister.setEnabled(true);
-                                            Toast.makeText(this, "Pre-registro exitoso. Ahora inicia sesión con tus credenciales.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(
+                                                    this,
+                                                    "Pre-registro exitoso. Espera aprobación del administrador.",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
 
-                                            // Redirigir a LoginActivity
                                             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                             startActivity(intent);
                                             finish();
                                         })
                                         .addOnFailureListener(e -> {
-                                            // Aún así cerrar sesión aunque falle la solicitud
                                             mAuth.signOut();
                                             progress.setVisibility(View.GONE);
                                             btnRegister.setEnabled(true);
                                             Log.e(TAG, "Error creando agency_request", e);
+                                            Toast.makeText(
+                                                    this,
+                                                    "Perfil creado, pero falló crear solicitud: " + e.getMessage(),
+                                                    Toast.LENGTH_LONG
+                                            ).show();
 
                                             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -200,7 +231,6 @@ public class RegisterActivity extends AppCompatActivity {
                                         });
                             })
                             .addOnFailureListener(e -> {
-                                // Si falla guardar el perfil, también cerrar sesión
                                 if (mAuth.getCurrentUser() != null) {
                                     mAuth.signOut();
                                 }
@@ -211,6 +241,7 @@ public class RegisterActivity extends AppCompatActivity {
                             });
                 });
     }
+
     private void handleAuthError(Exception e) {
         if (e instanceof FirebaseAuthException) {
             FirebaseAuthException fae = (FirebaseAuthException) e;
