@@ -87,6 +87,9 @@ public class FilterVehiclesFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
+        // ✅ Resetear la hora al inicio del día desde el inicio
+        setStartOfDay(baseCal);
+
         // Spinner de agencias
         agenciesAdapter = new ArrayAdapter<>(
                 requireContext(),
@@ -182,6 +185,7 @@ public class FilterVehiclesFragment extends Fragment {
             baseCal.set(Calendar.YEAR, year);
             baseCal.set(Calendar.MONTH, month);
             baseCal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            setStartOfDay(baseCal);
             tvPickedDate.setText(sdfDay.format(baseCal.getTime()));
         }, y, m, d).show();
     }
@@ -216,17 +220,33 @@ public class FilterVehiclesFragment extends Fragment {
         }
         String agencyId = agencyIds.get(pos);
 
-        // Calcula [start, end) según rango
+        // ✅ Calcula [start, end) según rango
         Calendar start = Calendar.getInstance();
         start.setTime(baseCal.getTime());
         setStartOfDay(start);
 
-        Calendar end = (Calendar) start.clone();
+        Calendar end = Calendar.getInstance();
+        end.setTime(baseCal.getTime());
+        setStartOfDay(end);
+
         if (rbDay.isChecked()) {
+            // Solo el día seleccionado
             end.add(Calendar.DAY_OF_MONTH, 1);
+
         } else if (rbWeek.isChecked()) {
-            end.add(Calendar.DAY_OF_MONTH, 7);
+            // ✅ Toda la semana (Lunes a Domingo)
+            // Ir al inicio de la semana (lunes)
+            start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            // Ir al final de la semana (domingo 23:59:59)
+            end.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            end.add(Calendar.WEEK_OF_YEAR, 1);
+
         } else { // Mes
+            // ✅ Todo el mes (día 1 al último día)
+            // Ir al primer día del mes
+            start.set(Calendar.DAY_OF_MONTH, 1);
+            // Ir al primer día del mes siguiente
+            end.set(Calendar.DAY_OF_MONTH, 1);
             end.add(Calendar.MONTH, 1);
         }
 
